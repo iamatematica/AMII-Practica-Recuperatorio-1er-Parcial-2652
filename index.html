@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Práctica para el recuperatorio · 1.er parcial · AM II Química</title>
+<!-- laboratoriobest-IA · Análisis Matemático II · Tecnicatura Superior en Química · INSPT-UTN · comisión 2652
+     Práctica para el recuperatorio del primer parcial: ecuaciones diferenciales (lineales y separables),
+     verificación de soluciones, dominio de campos escalares y trazas de superficies, más dos simulacros.
+     Archivo único: HTML5 + CSS + JS vanilla + canvas 2D (sin librerías externas) -->
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0f2244; --blue:#1d6fcc; --bg:#eef4fb;
+  --g50:#f8fafc; --g100:#f1f5f9; --g200:#e2e8f0; --g300:#cbd5e1; --g400:#94a3b8; --g500:#64748b; --g600:#475569; --g700:#334155; --g800:#1e293b;
+  --ok:#059669; --ok-bg:#ecfdf5; --ok-bd:#a7f3d0;
+  --amb:#b45309; --amb-bg:#fffbeb; --amb-bd:#fcd34d;
+  --def:#1e40af; --def-bg:#eef4ff; --def-bd:#93c5fd;
+  --err:#be123c; --err-bg:#fff1f2; --err-bd:#fecdd3;
+  --int:#6d28d9; --int-bg:#f5f3ff; --int-bd:#c4b5fd;
+  --lab-terra:#b57d4c; --lab-blue:#415a8e; --lab-dark:#20201c; --lab-cream:#faf8f1; --lab-gray:#6579a1;
+  --ej:#1d6fcc;
+  --rl:16px; --sh:0 4px 6px -1px rgba(0,0,0,.08),0 2px 4px -1px rgba(0,0,0,.05);
+  --mathfont:'STIX Two Text','STIX Two Math','Cambria Math','Times New Roman',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',system-ui,sans-serif;background:var(--bg);color:var(--g800);line-height:1.6;min-height:100vh}
+h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;line-height:1.25;color:var(--navy)}
+h1{font-size:clamp(1.6rem,3.5vw,2.2rem)} h2{font-size:clamp(1.25rem,2.6vw,1.6rem)} h3{font-size:1.15rem} h4{font-size:1rem}
+p{margin-bottom:.7em} strong{color:var(--navy)}
+ul,ol{margin:.3em 0 .8em 1.3em} li{margin:.25em 0}
+sup,sub{font-size:.72em;line-height:0;vertical-align:baseline;position:relative}
+sub{top:.34em} sup{top:-.48em}
+.fr .fn sup,.fr .fd sup{top:-.42em} .fr .fn sub,.fr .fd sub{top:.3em}
+button{font-family:inherit}
+
+/* ---------- matemática (STIX Two Text, cursiva solo en variables, fracciones apiladas) ---------- */
+.mi,.md{font-family:var(--mathfont);font-style:normal}
+.mi{white-space:nowrap;font-size:1.06em}
+.mi i,.md i{font-style:italic}
+.op{font-style:normal}
+.tx{font-family:'Outfit',sans-serif;font-style:normal;font-size:.9em}
+.md{display:block;font-size:1.18em;margin:.55em 0;padding:.25em .4em;line-height:1.7;text-align:center;white-space:normal;overflow-wrap:anywhere;overflow-x:auto;overflow-y:hidden}
+.md .fr,.md .par,.md .rt,.md .sis{white-space:nowrap}
+.fr{display:inline-flex;flex-direction:column;align-items:stretch;vertical-align:middle;margin:0 .15em;text-align:center;line-height:1.25}
+.fr .fn{padding:0 .3em .1em;border-bottom:1.3px solid currentColor}
+.fr .fd{padding:.1em .3em 0}
+.fr.sm{font-size:.85em}
+sup .fr,sub .fr{font-size:.95em;margin:0 .05em;vertical-align:baseline}
+.rt{display:inline-flex;align-items:stretch;vertical-align:middle;margin:0 .08em;white-space:nowrap}
+.rt .sg{position:relative;width:.72em;flex-shrink:0}
+.rt .sg svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.rt .rd{border-top:1.3px solid currentColor;padding:.1em .12em 0 .1em;display:inline-flex;align-items:center}
+.par{display:inline-flex;align-items:center;vertical-align:middle;gap:.1em}
+.par .pl,.par .pr{align-self:stretch;display:inline-flex;align-items:center}
+.par .in,.rd .in{display:inline;white-space:nowrap}
+.par:has(.fr) .pl,.par:has(.fr) .pr{font-size:1.9em;font-weight:200;line-height:.8}
+.sis{display:inline-flex;align-items:stretch;vertical-align:middle;margin:.15em .2em}
+.sis .llave-w{position:relative;flex-shrink:0;align-self:stretch;width:.62em;min-width:8px;margin-right:.3em}
+.sis .llave-w svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.sis .sis-l{display:inline-flex;flex-direction:column;justify-content:center;gap:.35em;padding:.15em 0;text-align:left}
+.sis .sis-r{display:block;white-space:nowrap}
+.pal{display:inline-block;white-space:nowrap}
+
+/* ---------- chrome oficial ---------- */
+.topbar{background:linear-gradient(135deg,var(--navy) 0%,#1a3a6e 100%);color:#e0f2fe;padding:14px 0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.topbar-inner{max-width:1160px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-inspt{font-size:12px;color:#7dd3fc;letter-spacing:.1em;font-weight:700}
+.brand-title{font-family:'Fraunces',serif;font-size:18px;color:#fff;font-weight:700}
+.brand-sub{font-size:12px;color:#bfdbfe}
+.lab-logo{background:var(--lab-cream);padding:8px 18px 7px;border-radius:12px;text-align:left;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.lab-name{display:flex;align-items:center;font-family:'Fraunces',Georgia,serif;font-size:16px;font-weight:700;letter-spacing:-0.01em;line-height:1.2}
+.lab-name .bullet{width:8px;height:8px;border-radius:50%;background:var(--lab-terra);flex-shrink:0;margin-right:7px}
+.lab-name .lab{color:var(--lab-dark)} .lab-name .best{color:var(--lab-terra)} .lab-name .ia{color:var(--lab-blue)}
+.lab-sub{color:var(--lab-gray);font-size:11px;font-weight:500;margin-top:1px;padding-left:15px;font-family:'Outfit',sans-serif}
+.site-footer{background:var(--navy);color:#cbd5e1;padding:30px 0 24px;margin-top:40px}
+.footer-inner{max-width:1160px;margin:0 auto;padding:0 20px;text-align:center}
+.footer-quote{font-family:'Fraunces',serif;font-style:italic;font-size:1.1rem;color:#e0f2fe;margin-bottom:16px}
+.footer-lab{display:inline-block;background:var(--lab-cream);padding:10px 22px 9px;border-radius:12px;text-align:left;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.footer-lab .lab-name{font-size:17px} .footer-lab .lab-sub{font-size:12px}
+
+/* ---------- pestañas ---------- */
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:#fff;border-bottom:1px solid var(--g200);box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.tabs-inner{max-width:1160px;margin:0 auto;display:flex;align-items:center;overflow-x:auto}
+.tab-btn{flex:0 0 auto;padding:14px 11px;border:none;background:none;font-size:14px;font-weight:700;color:var(--g600);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.tab-btn:hover{color:var(--navy);background:var(--g50)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
+.tab-btn .tn{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--g200);color:var(--g700);font-size:12px;align-items:center;justify-content:center;margin-right:7px;font-family:'Fira Code',monospace}
+.tab-btn.active .tn{background:var(--blue);color:#fff}
+.prog{margin-left:auto;padding:0 20px 0 12px;flex-shrink:0;font-size:12.5px;color:var(--g600);display:flex;align-items:center;gap:8px;white-space:nowrap}
+.prog .bar{width:90px;height:6px;background:var(--g200);border-radius:99px;overflow:hidden}
+.prog .bar i{display:block;height:100%;background:var(--blue);width:0;transition:width .4s}
+.tab-content{display:none} .tab-content.active{display:block;animation:aparecer .35s ease}
+@keyframes aparecer{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+main{max-width:1160px;margin:0 auto;padding:22px 20px 40px;overflow-x:hidden}
+
+.banner{background:linear-gradient(135deg,var(--navy),#1a3a6e 60%,#234b8a);color:#e0f2fe;border-radius:var(--rl);padding:24px 28px;margin-bottom:16px;position:relative;overflow:hidden}
+.banner h1{color:#fff;margin-bottom:6px}
+.banner .kick{font-family:'Fira Code',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:#7dd3fc;font-weight:500;margin-bottom:6px}
+.banner p{color:#dbeafe;max-width:74ch;margin:0} .banner strong{color:#fff}
+.banner .wm{position:absolute;right:-6px;bottom:-30px;font-family:'Fraunces',serif;font-weight:700;font-size:6rem;color:rgba(255,255,255,.05);pointer-events:none;white-space:nowrap}
+
+.card{background:#fff;border-radius:var(--rl);box-shadow:var(--sh);padding:22px 24px;margin-bottom:20px;border-top:4px solid var(--ej);min-width:0;scroll-margin-top:70px}
+.card.pr{border-top-color:var(--int)}
+.sec-h{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.sec-h .num{font-family:'Fraunces',serif;font-weight:700;color:var(--blue);font-size:1.3rem}
+.nota{font-size:.9rem;color:var(--g600)}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.grid2>*{min-width:0}
+@media(max-width:860px){.grid2{grid-template-columns:minmax(0,1fr)}}
+
+.box{border-radius:10px;padding:11px 15px;margin:10px 0;font-size:.97rem;border:1px solid var(--g200);background:#fff}
+.box .bt{font-weight:700;display:block;margin-bottom:3px;font-size:.9rem;letter-spacing:.02em}
+.def{background:var(--def-bg);border:1px solid var(--def-bd);border-left:4px solid var(--def);color:#1e3a8a} .def .bt{color:var(--def)}
+.voz{background:var(--amb-bg);border:1px solid var(--amb-bd);border-left:4px solid var(--amb);color:#78350f} .voz .bt{color:var(--amb)}
+.err{background:var(--err-bg);border:1px solid var(--err-bd);border-left:4px solid var(--err);color:#881337} .err .bt{color:var(--err)}
+.okb{background:var(--ok-bg);border:1px solid var(--ok-bd);border-left:4px solid var(--ok);color:#064e3b} .okb .bt{color:var(--ok)}
+.box ol,.box ul{margin:.3em 0 .2em 1.2em}
+.tbl{overflow-x:auto;overflow-y:hidden;margin:10px 0}
+.tbl table{border-collapse:collapse;width:100%;font-size:14.5px;background:#fff}
+.tbl th,.tbl td{border:1px solid var(--g200);padding:8px 10px;text-align:left;vertical-align:middle}
+.tbl th{background:var(--g100);font-weight:700;color:var(--navy)}
+.tbl td.k{font-weight:700;color:var(--navy)}
+.malbien{margin-top:10px;gap:12px}
+.mb{background:#fff;border:1.5px solid var(--g200);border-radius:10px;padding:10px 14px;color:var(--g800)}
+.mb .mbt{display:block;font-weight:700;margin-bottom:4px}
+.mb.mal{border-color:var(--err-bd)} .mb.mal .mbt{color:var(--err)}
+.mb.bien{border-color:var(--ok-bd)} .mb.bien .mbt{color:var(--ok)}
+
+/* mapa del examen */
+.exgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:14px;margin:12px 0}
+.exc{border:1px solid var(--g200);border-radius:12px;padding:14px 16px;background:var(--g50);display:flex;flex-direction:column;gap:6px}
+.exc .ek{font-family:'Fira Code',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--blue);font-weight:500}
+.exc h3{font-size:1.05rem}
+.exc p{margin:0;font-size:.92rem}
+.exc .ir{margin-top:auto;align-self:flex-start}
+
+/* el parcial resuelto */
+.hoja{background:#fffdf7;border:1px solid #e7dcc3;border-radius:12px;padding:18px 22px;margin:12px 0;font-family:'STIX Two Text','Times New Roman',serif;color:#1f2937}
+.hoja .hh{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px 16px;font-size:.95rem;border-bottom:1.5px solid #1f2937;padding-bottom:6px;margin-bottom:10px}
+.hoja .hh b{font-weight:700}
+.hoja h3{font-family:'STIX Two Text','Times New Roman',serif;font-size:1.3rem;margin:4px 0 8px}
+.hoja ul{margin:.2em 0 .6em 1.2em;font-size:.95rem} .hoja li{margin:.15em 0}
+.hoja .ej{margin:10px 0}
+.hoja .ej .en{font-weight:700;margin-right:6px}
+.rub{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin:10px 0}
+@media(max-width:860px){.rub{grid-template-columns:minmax(0,1fr)}}
+.rub ul{margin:.2em 0 0 1.1em} .rub li{margin:.2em 0}
+.rub .box{margin:0;height:100%}
+.ok-li li::marker{content:'✓  ';color:var(--ok)} .no-li li::marker{content:'✗  ';color:var(--err)}
+
+/* acordeones y pasos */
+.acc{border:1px solid var(--g200);border-radius:10px;margin:10px 0;background:#fff;overflow:hidden}
+.acc-h{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;user-select:none;font-weight:600;color:var(--navy);background:var(--g50)}
+.acc-h:hover{background:var(--g100)}
+.acc-h .acc-t{flex:1;min-width:0}
+.acc-h .chev{margin-left:auto;transition:transform .2s;color:var(--g500);font-size:12px}
+.acc.open>.acc-h .chev{transform:rotate(180deg)}
+.acc-b{display:none;padding:12px 16px 14px;border-top:1px solid var(--g200)}
+.acc.open>.acc-b{display:block}
+.acc.teo>.acc-h{background:var(--def-bg);color:var(--def)}
+.acc.step>.acc-h{background:#fff}
+.acc.step>.acc-h .sn{background:var(--ej);color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;font-family:'Fira Code',monospace}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.btn{background:#fff;border:1.5px solid var(--g300);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)} .btn.primary:hover{background:var(--navy);color:#fff}
+.btn.on{background:var(--def-bg);border-color:var(--blue);color:var(--blue)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.sm{padding:4px 9px;font-size:12px}
+.btn.alerta{border-color:var(--err);color:var(--err)}
+
+/* ejercicios */
+.q{background:#fff;border:1px solid var(--g200);border-radius:12px;padding:16px 18px;margin:12px 0}
+.q .qn{font-weight:700;color:var(--navy);margin-bottom:6px;display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.q .qn .k{display:inline-flex;min-width:28px;height:26px;border-radius:7px;background:var(--ej);color:#fff;font-size:12.5px;align-items:center;justify-content:center;flex-shrink:0;padding:0 6px;font-family:'Fira Code',monospace}
+.q .enq{font-weight:500;color:var(--g800);flex:1;min-width:0}
+.q .enq .md{margin:.35em 0}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.badge.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-bd)}
+.opts{display:grid;gap:6px;margin:8px 0}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:8px 12px;border:1.5px solid var(--g200);border-radius:8px;cursor:pointer;background:#fff;text-align:left;font-size:.96rem;color:var(--g800)}
+.opt:hover:not(:disabled){border-color:var(--blue)}
+.opt .k{font-weight:700;color:var(--g500);flex-shrink:0}
+.opt.right{border-color:var(--ok);background:var(--ok-bg)} .opt.wrong{border-color:var(--err);background:var(--err-bg)}
+.opt:disabled{cursor:default}
+.numin{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.numin input{font-family:var(--mathfont);font-size:15px;padding:6px 9px;border:1.5px solid var(--g300);border-radius:8px;width:110px}
+.numin input:disabled{background:var(--g50)}
+.numin .lb{font-family:var(--mathfont);font-size:1.05em}
+.numin input.mal{border-color:var(--err);background:var(--err-bg)}
+.sino{display:inline-flex;border:1.5px solid var(--g300);border-radius:8px;overflow:hidden}
+.sino button{border:none;background:#fff;padding:5px 12px;font-size:13px;font-weight:600;color:var(--g600);cursor:pointer}
+.sino button+button{border-left:1.5px solid var(--g300)}
+.sino button.sel{background:var(--def-bg);color:var(--blue)}
+.sino.mal{border-color:var(--err)} .sino.mal button.sel{background:var(--err-bg);color:var(--err)}
+.sino button:disabled{cursor:default}
+.ver-grid{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;align-items:center;margin:8px 0;max-width:560px}
+.ver-grid .vl{font-size:.92rem;font-weight:600;color:var(--g700)}
+.ver-grid input{font-family:var(--mathfont);font-size:15px;padding:5px 9px;border:1.5px solid var(--g300);border-radius:8px;width:70px}
+.ver-grid input.mal{border-color:var(--err);background:var(--err-bg)}
+.dom-list{display:grid;gap:8px;margin:8px 0}
+.dom-it{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:6px 10px;border:1px solid var(--g200);border-radius:8px;background:var(--g50)}
+.dom-it .dt{flex:1;min-width:180px;font-size:.95rem}
+.tr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:8px 0}
+.tr-it{border:1px solid var(--g200);border-radius:8px;padding:8px 10px;background:var(--g50);display:flex;flex-direction:column;gap:4px}
+.tr-it .tl{font-size:.88rem;font-weight:600;color:var(--g700)}
+.tr-it select{font-family:inherit;font-size:13.5px;padding:5px 8px;border:1.5px solid var(--g300);border-radius:6px;background:#fff;max-width:100%}
+.tr-it select.mal{border-color:var(--err);background:var(--err-bg)}
+.tr-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:8px 0}
+@media(max-width:640px){.tr-cols{grid-template-columns:minmax(0,1fr)}}
+.tr-col{border:1px solid var(--def-bd);border-radius:10px;padding:10px 12px;background:#fff;min-width:0}
+.tr-col .tr-gt{font-weight:700;color:var(--def);font-size:.95rem;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--def-bd)}
+.tr-grid.uno{grid-template-columns:minmax(0,1fr);margin:0}
+.fb{display:none;margin-top:8px;padding:9px 12px;border-radius:8px;font-size:.95rem}
+.fb.show{display:block}
+.fb.ok{background:var(--ok-bg);border:1px solid var(--ok-bd);color:#064e3b}
+.fb.no{background:var(--err-bg);border:1px solid var(--err-bd);color:#881337}
+.pista{display:none;margin-top:8px;padding:9px 12px;border-radius:8px;font-size:.95rem;background:var(--amb-bg);border:1px solid var(--amb-bd);color:#78350f}
+.pista.show{display:block}
+.resol{display:none;margin-top:10px;border-top:1px dashed var(--g300);padding-top:8px}
+.resol.show{display:block}
+.resol .paso{margin:8px 0 10px}
+.resol .paso .pt{display:block;font-weight:700;color:var(--navy);font-size:.95rem;margin-bottom:2px}
+.resol .paso .pt .pn{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--ej);color:#fff;font-size:11.5px;align-items:center;justify-content:center;margin-right:7px;font-family:'Fira Code',monospace;vertical-align:middle}
+.final{border-radius:10px;padding:10px 14px;margin:10px 0 4px;background:var(--ok-bg);border:1px solid var(--ok-bd);border-left:4px solid var(--ok);color:#064e3b}
+.final .bt{font-weight:700;display:block;margin-bottom:2px;font-size:.9rem;color:var(--ok)}
+.cv-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:10px 0}
+.cv-w{display:flex;flex-direction:column;gap:4px;min-width:0}
+.cv-w .ct{font-size:.85rem;font-weight:600;color:var(--g700);text-align:center}
+canvas.c2d{width:100%;display:block;border:1px solid var(--g200);border-radius:8px;background:#fff}
+.cv-dom{max-width:420px}
+.leyenda{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--g600);margin:4px 0 8px}
+.leyenda span::before{content:'';display:inline-block;width:14px;height:4px;border-radius:2px;margin-right:5px;vertical-align:3px;background:var(--c)}
+.leyenda span.dash::before{background:repeating-linear-gradient(90deg,var(--c) 0 4px,transparent 4px 7px)}
+.leyenda span.fill::before{height:10px;vertical-align:-1px;opacity:.5}
+button:focus-visible,input:focus-visible,select:focus-visible,.acc-h:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:24px;flex-wrap:wrap}
+.sim-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.sim-tag{font-family:'Fira Code',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;font-weight:500;color:#fff;background:var(--int);padding:3px 10px;border-radius:999px}
+
+@media(max-width:640px){
+  .topbar-inner{justify-content:center;text-align:center}
+  main{padding:16px 12px 30px}
+  .card{padding:16px 14px}
+  .banner{padding:20px 18px} .banner .wm{font-size:4rem}
+  .md{font-size:1.06em}
+  .tab-btn{padding:12px 10px;font-size:14px}
+  .tab-btn .lg{display:none}
+  .prog{display:none}
+  .ver-grid{grid-template-columns:1fr}
+  .md .par,.md .par .in{white-space:normal}
+}
+@media print{
+  .tabs,.tools,.pager{display:none!important}
+  .tab-content{display:block!important} .acc-b,.resol,.pista{display:block!important}
+  body{background:#fff} .card,.q{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div>
+        <div class="brand-inspt">I·N·S·P·T &nbsp;·&nbsp; UTN</div>
+        <div class="brand-title">Práctica para el recuperatorio del 1.<sup>er</sup> parcial</div>
+        <div class="brand-sub">Análisis Matemático II · Tecnicatura Superior en Química</div>
+      </div>
+    </div>
+    <div class="lab-logo">
+      <div class="lab-name"><span class="bullet"></span><span class="lab">laboratorio</span><span class="best">best</span><span class="ia">-IA</span></div>
+      <div class="lab-sub">Prof. Ariel L. Cardozo Delgado</div>
+    </div>
+  </div>
+</header>
+<nav class="tabs" aria-label="Categorías">
+  <div class="tabs-inner">
+    <button class="tab-btn active" data-tab="mapa"><span class="tn">0</span>Mapa</button>
+    <button class="tab-btn" data-tab="par"><span class="tn">1</span>El parcial<span class="lg"> resuelto</span></button>
+    <button class="tab-btn" data-tab="lin"><span class="tn">2</span>Lineales</button>
+    <button class="tab-btn" data-tab="sep"><span class="tn">3</span>Separables</button>
+    <button class="tab-btn" data-tab="ver"><span class="tn">4</span>Verificar</button>
+    <button class="tab-btn" data-tab="dom"><span class="tn">5</span>Dominio</button>
+    <button class="tab-btn" data-tab="tra"><span class="tn">6</span>Trazas</button>
+    <button class="tab-btn" data-tab="sim"><span class="tn">7</span>Simulacros</button>
+    <div class="prog"><span id="prog-txt">0 de 0 ejercicios</span><div class="bar"><i id="prog-bar"></i></div></div>
+  </div>
+</nav>
+<main>
+
+<!-- ======================= PESTAÑA 0 · MAPA ======================= -->
+<section id="tab-mapa" class="tab-content active">
+  <div class="banner">
+    <div class="kick">Recuperatorio · 19 de noviembre</div>
+    <h1>Qué se toma y cómo prepararlo</h1>
+    <p>El recuperatorio abarca <strong>todos los temas del primer cuatrimestre</strong>: ecuaciones diferenciales de variables separables y lineales, verificación de soluciones con orden y grado, dominio de campos escalares y trazas de superficies. El primer parcial tuvo cuatro ejercicios; el recuperatorio puede tener otra cantidad y otro reparto, así que conviene preparar los cinco temas por igual. Cada pestaña trae lo esencial del tema, ejemplos resueltos completos y seis ejercicios del nivel del parcial; la pestaña 1 muestra cómo fue el primer parcial y cómo se corrige; la última, dos simulacros para hacer en papel.</p>
+    <div class="wm">AM II</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">1</span><h2>Los temas que entran</h2></div>
+    <p class="nota">Para cada uno, qué se pide y qué se mira al corregir. El orden es el de las pestañas.</p>
+    <div class="exgrid">
+      <div class="exc"><span class="ek">Tema</span><h3>Ecuación diferencial de variables separables</h3>
+        <p>Una ecuación que se puede acomodar con lo de \(y\) de un lado y lo de \(x\) del otro, en general con una <strong>condición inicial</strong>.</p>
+        <p class="nota">Se corrige: la separación bien hecha, las dos integrales con una sola constante, el despeje cuando se puede y la constante calculada con la condición.</p>
+        <button class="btn sm ir" data-ir="sep">Practicar →</button></div>
+      <div class="exc"><span class="ek">Tema</span><h3>Ecuación diferencial lineal de primer orden</h3>
+        <p>Una ecuación del tipo \(x\,y'+a\,y=\text{polinomio}\). Se pide la <strong>solución general</strong> y después la <strong>solución particular</strong> que pasa por un punto dado.</p>
+        <p class="nota">Se corrige: pasar a la forma normal, obtener el factor integrante, integrar sin olvidar la constante, y despejar \(y\). La constante se calcula al final con el punto.</p>
+        <button class="btn sm ir" data-ir="lin">Practicar →</button></div>
+      <div class="exc"><span class="ek">Tema</span><h3>Verificar una solución, orden y grado</h3>
+        <p>Dada una ecuación y una función, decidir si la función <strong>es solución</strong> (sustituyendo), indicar <strong>orden y grado</strong> de la ecuación y decir si la solución dada es <strong>general o particular</strong>, explicando por qué.</p>
+        <p class="nota">Se corrige: las derivadas bien calculadas, la sustitución escrita completa, y la justificación de cada respuesta (no alcanza con "sí" o "no").</p>
+        <button class="btn sm ir" data-ir="ver">Practicar →</button></div>
+      <div class="exc"><span class="ek">Tema</span><h3>Dominio de un campo escalar</h3>
+        <p>Un campo \(f(x,y)\) con raíz y cociente (a veces logaritmo). Se pide el dominio en <strong>forma analítica</strong> (el conjunto escrito con sus condiciones) y en <strong>forma gráfica</strong>.</p>
+        <p class="nota">Se corrige: la tabla de condiciones (qué operación se puede hacer siempre y cuál no), el conjunto bien escrito, y el gráfico con la frontera marcada según pertenezca o no.</p>
+        <button class="btn sm ir" data-ir="dom">Practicar →</button></div>
+      <div class="exc"><span class="ek">Tema</span><h3>Trazas de superficies</h3>
+        <p>Superficies dadas por su ecuación (planos, esfera, elipsoide, paraboloide, hiperboloides). Para cada una, hallar las <strong>trazas</strong> con los planos coordenados, graficarlas en su plano y <strong>clasificarlas</strong>.</p>
+        <p class="nota">Se corrige: el sistema planteado para cada traza, la ecuación resultante, el nombre de la curva (recta, circunferencia, elipse, parábola, hipérbola, o que no hay traza) y el gráfico.</p>
+        <button class="btn sm ir" data-ir="tra">Practicar →</button></div>
+    </div>
+    <div class="box voz"><span class="bt">Cómo se corrige</span>Todos los ejercicios deben tener los pasos de resolución, las justificaciones y las construcciones escritas: un resultado correcto sin el desarrollo no se considera. Enumerá las hojas y anotá en el encabezado cuántas entregás.</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">2</span><h2>Los errores que más se repitieron</h2></div>
+    <div class="tbl"><table><thead><tr><th>Tema</th><th>Error</th><th>Cómo evitarlo</th></tr></thead><tbody>
+      <tr><td class="k">Separables</td><td>Separar "a medias" y dejar una \(x\) del lado de \(\dd y\), o poner una constante de cada lado y tratarlas como distintas.</td><td>Si no se puede llevar todo a cada lado, la ecuación no es separable. Una sola \(C\), de un solo lado.</td></tr>
+      <tr><td class="k">Lineales</td><td>Calcular el factor integrante con el coeficiente de \(y\) tal como viene, sin dividir antes por \(x\).</td><td>Primero la forma normal \(y'+P(x)\,y=Q(x)\): el coeficiente de \(y'\) tiene que ser 1. Recién ahí se lee \(P(x)\).</td></tr>
+      <tr><td class="k">Lineales</td><td>Olvidar la constante al integrar, o ponerla y después no dividirla por el factor.</td><td>Escribir \(\varphi\,y=\int\varphi\,Q\,\dd x+C\) y dividir <em>todo</em> por \(\varphi\), incluida la \(C\).</td></tr>
+      <tr><td class="k">Lineales</td><td>Usar la condición inicial antes de tener la solución general.</td><td>La condición se aplica al final: reemplazar el punto en la general y despejar \(C\).</td></tr>
+      <tr><td class="k">Verificar</td><td>Derivar bien pero sustituir mal, o concluir "es solución" sin escribir la sustitución.</td><td>Calcular las derivadas aparte, reemplazarlas en la ecuación y mostrar que queda una identidad (o que no).</td></tr>
+      <tr><td class="k">Verificar</td><td>Confundir orden con grado, o leer el grado de una potencia de \(x\).</td><td>Orden: la derivada más alta. Grado: la potencia a la que está elevada esa derivada más alta.</td></tr>
+      <tr><td class="k">Dominio</td><td>Escribir una sola condición cuando hay dos (raíz y denominador), o unirlas con "o" en vez de "y".</td><td>Una condición por operación problemática. Todas tienen que cumplirse a la vez: se unen con \(\wedge\).</td></tr>
+      <tr><td class="k">Dominio</td><td>Dibujar la frontera siempre igual.</td><td>Trazo continuo si la frontera pertenece (\(\ge\), \(\le\)); trazo punteado si no pertenece (\(>\), \(<\), \(\ne\)).</td></tr>
+      <tr><td class="k">Trazas</td><td>Escribir "la traza es \(-\dfrac{y^2}{16}=1\)" y no sacar conclusión.</td><td>Si la ecuación que queda no tiene solución real, la superficie <strong>no corta</strong> ese plano: no hay traza, y hay que decirlo.</td></tr>
+      <tr><td class="k">Trazas</td><td>Graficar la traza en el plano equivocado.</td><td>La traza con \(z=0\) vive en el plano \(xy\); con \(y=0\), en el plano \(xz\); con \(x=0\), en el plano \(yz\).</td></tr>
+    </tbody></table></div>
+  </div>
+
+  <div class="card pr">
+    <div class="sec-h"><span class="num">3</span><h2>Antes de empezar: reconocer qué método va</h2></div>
+    <p class="nota">Dos preguntas rápidas. La corrección aparece al instante.</p>
+    <div id="q-mapa"></div>
+  </div>
+  <div class="pager"><span></span><button class="btn primary" data-ir="par">Ver cómo fue el primer parcial →</button></div>
+</section>
+
+
+<!-- ======================= PESTAÑA 1 · EL PARCIAL RESUELTO ======================= -->
+<section id="tab-par" class="tab-content">
+  <div class="banner">
+    <div class="kick">Comisión 2652 · 2 de julio de 2026 · Tema único</div>
+    <h1>El primer parcial, tal como se tomó</h1>
+    <p>Acá está el examen completo, con las notas del encabezado y los cuatro enunciados en el orden en que aparecieron. Debajo de cada ejercicio, <strong>qué tiene que estar escrito para que se considere bien</strong> y en qué se pierde. Sirve para ver el nivel y la forma de corregir; <strong>el recuperatorio no tiene por qué repetir esta estructura</strong>: puede tener otra cantidad de ejercicios y otro reparto de temas (por ejemplo, una ecuación de variables separables). La resolución paso a paso de cada ejercicio está en la pestaña de su tema: el botón te lleva directo.</p>
+    <div class="wm">2·7·26</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">1</span><h2>La hoja del examen</h2></div>
+    <div class="hoja">
+      <div class="hh"><span><b>INSPT-UTN</b><br>C65</span><span style="text-align:right"><b>Análisis Matemático II</b><br>Primer Parcial</span></div>
+      <p style="font-size:.9rem;margin-bottom:6px">Fecha: ______ &nbsp;&nbsp; Apellido y nombre: ______________________ &nbsp;&nbsp; Cantidad de hojas que entrega: ____</p>
+      <h3>Notas</h3>
+      <ul>
+        <li>Por favor, apague sus dispositivos electrónicos.</li>
+        <li>No utilizar lápiz ni lapicera de tinta borrable, salvo para el trazado de circunferencias en caso de necesitar dibujar una.</li>
+        <li>Enumerar las hojas e indicar cuántas entrega en el encabezado.</li>
+        <li>Todos los ejercicios deben constar de los pasos de resolución, justificaciones, argumentaciones, construcciones y pasos de construcción escritos para ser considerados.</li>
+      </ul>
+      <h3>Enunciados</h3>
+      <div class="ej"><span class="en">E1.</span> a) Hallar la solución general de la ecuación diferencial: \[x\,y'-2y=x^4-x^2\] b) Hallar la solución particular que pasa por el punto \((1\,;\,3)\).</div>
+      <div class="ej"><span class="en">E2.</span> Verificar que la ecuación \(y''-4y'=0\) tiene como solución \(y=-\dfrac{x^2}{2}\). Indicar orden y grado de la ecuación diferencial. ¿La solución dada es general o particular? Explicar.</div>
+      <div class="ej"><span class="en">E3.</span> Sea \(f:D\subseteq\mathbb{R}^2\to\mathbb{R}\,/\,f(x,y)=\dfrac{\sqrt{x^2+y^2-16}}{y-2}\). Hallar el dominio analítica y gráficamente.</div>
+      <div class="ej"><span class="en">E4.</span> Hallar las trazas de las superficies dadas. Graficarlas en los planos correspondientes y clasificarlas: a) \(3x-2y+z-6=0\); &nbsp; b) \(\dfrac{x^2}{4}+\dfrac{y^2}{4}+\dfrac{z^2}{16}=1\).</div>
+    </div>
+    <div class="box voz"><span class="bt">Cómo se corrige</span>Cada ejercicio se califica completo, leyendo el desarrollo paso por paso: lo que importa es que cada paso esté escrito y justificado, no solo el resultado final. Con todos los ejercicios bien, la nota es 10. Un ejercicio con el resultado correcto pero sin el desarrollo no se considera.</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">2</span><h2>Ejercicio 1 · la ecuación lineal</h2></div>
+    <p>\(x\,y'-2y=x^4-x^2\): solución general y particular por \((1\,;\,3)\).</p>
+    <div class="rub">
+      <div class="box okb ok-li"><span class="bt">Qué tiene que estar</span><ul>
+        <li>La forma normal, dividiendo por \(x\): \(y'-\dfrac{2}{x}\,y=x^3-x\), con \(P(x)\) y \(Q(x)\) identificados.</li>
+        <li>El factor integrante <em>calculado</em>, no recordado: \(\varphi'=P\,\varphi\) resuelta, o \(\varphi=\ee^{\int P\,\dd x}\) con la integral hecha, hasta \(\varphi=x^{-2}\).</li>
+        <li>La ecuación multiplicada por \(\varphi\) y el lado izquierdo reconocido como \(\left(\dfrac{y}{x^2}\right)'\).</li>
+        <li>La integral de \(x-\dfrac{1}{x}\) con su constante, y la solución general despejada y recuadrada: \(y=\dfrac{x^4}{2}-x^2\ln|x|+C\,x^2\).</li>
+        <li>b) El punto reemplazado en la general, \(C=\dfrac{5}{2}\), y la particular escrita.</li></ul></div>
+      <div class="box err no-li"><span class="bt">Dónde se pierde</span><ul>
+        <li>Leer \(P(x)=-2\) sin dividir antes por \(x\): el factor integrante sale mal y nada cierra después.</li>
+        <li>Olvidar la constante al integrar, o ponerla y no multiplicarla por \(x^2\) al despejar.</li>
+        <li>Usar el punto \((1\,;\,3)\) antes de tener la general.</li>
+        <li>Escribir la fórmula \(y=\dfrac{1}{\varphi}\left[\int\varphi\,Q\,\dd x+C\right]\) de memoria y recordarla con el signo o la constante en el lugar equivocado. Si la usás, tiene que verse de dónde sale.</li></ul></div>
+    </div>
+    <div class="tools"><button class="btn primary" data-verej="lin">Ver la resolución paso a paso →</button></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">3</span><h2>Ejercicio 2 · verificar, orden y grado</h2></div>
+    <p>¿\(y=-\dfrac{x^2}{2}\) es solución de \(y''-4y'=0\)? Orden, grado, ¿general o particular?</p>
+    <div class="rub">
+      <div class="box okb ok-li"><span class="bt">Qué tiene que estar</span><ul>
+        <li>Las derivadas escritas aparte: \(y'=-x\), \(y''=-1\).</li>
+        <li>La sustitución completa en la ecuación: \(y''-4y'=-1-4\cdot(-x)=-1+4x\).</li>
+        <li>La conclusión con su razón: \(-1+4x\) no es cero para todo \(x\) (solo en \(x=\dfrac{1}{4}\)), así que <strong>no es solución</strong>.</li>
+        <li>Orden 2 (por \(y''\)) y grado 1 (está a la primera potencia), dichos con la justificación.</li>
+        <li>General o particular, explicado: la función no tiene constantes arbitrarias, así que sería particular; la general de una ecuación de orden 2 tiene dos constantes.</li></ul></div>
+      <div class="box err no-li"><span class="bt">Dónde se pierde</span><ul>
+        <li>Escribir "no es solución" (o "sí es") sin mostrar la sustitución.</li>
+        <li>Reemplazar un valor de \(x\), ver que "da" o "no da" y concluir de ahí.</li>
+        <li>Confundir orden con grado, o leer el grado del exponente de la \(x\).</li>
+        <li>Responder "particular" sin decir por qué (la explicación está pedida en el enunciado).</li></ul></div>
+    </div>
+    <div class="tools"><button class="btn primary" data-verej="ver">Ver la resolución paso a paso →</button></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">4</span><h2>Ejercicio 3 · dominio</h2></div>
+    <p>\(f(x,y)=\dfrac{\sqrt{x^2+y^2-16}}{y-2}\): dominio analítico y gráfico.</p>
+    <div class="rub">
+      <div class="box okb ok-li"><span class="bt">Qué tiene que estar</span><ul>
+        <li>Las dos condiciones, una por cada operación problemática: \(x^2+y^2-16\ge0\) (raíz) y \(y-2\ne0\) (división).</li>
+        <li>El conjunto escrito: \(D=\{(x\,;\,y)\in\mathbb{R}^2\,/\,x^2+y^2\ge16\wedge y\ne2\}\).</li>
+        <li>El gráfico: la circunferencia de radio 4 con trazo continuo, la recta \(y=2\) punteada, y sombreado el exterior de la circunferencia.</li>
+        <li>Una línea que diga de qué lado queda y por qué (el origen no cumple).</li></ul></div>
+      <div class="box err no-li"><span class="bt">Dónde se pierde</span><ul>
+        <li>Una sola condición, o las dos unidas con "o" en vez de "y".</li>
+        <li>Sombrear el interior: \((0\,;\,0)\) da \(-16\), no cumple \(\ge0\).</li>
+        <li>Dibujar la recta \(y=2\) continua, o no dibujarla.</li>
+        <li>Escribir \(>\) donde va \(\ge\): la raíz de cero existe, la circunferencia pertenece.</li></ul></div>
+    </div>
+    <div class="tools"><button class="btn primary" data-verej="dom">Ver la resolución paso a paso →</button></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">5</span><h2>Ejercicio 4 · trazas</h2></div>
+    <p>a) \(3x-2y+z-6=0\); b) \(\dfrac{x^2}{4}+\dfrac{y^2}{4}+\dfrac{z^2}{16}=1\). Trazas con los planos coordenados, gráficos y clasificación.</p>
+    <div class="rub">
+      <div class="box okb ok-li"><span class="bt">Qué tiene que estar</span><ul>
+        <li>Para cada superficie, los tres sistemas (con \(z=0\), \(y=0\), \(x=0\)) y la ecuación que queda en cada uno.</li>
+        <li>El nombre de cada traza: tres rectas para el plano; circunferencia \(x^2+y^2=4\) y dos elipses para el elipsoide.</li>
+        <li>Cada traza graficada en <em>su</em> plano, con los cortes con los ejes marcados (\(x=2\), \(y=-3\), \(z=6\) para el plano; semiejes 2 y 4 para las elipses).</li>
+        <li>La clasificación de la superficie: plano; elipsoide.</li></ul></div>
+      <div class="box err no-li"><span class="bt">Dónde se pierde</span><ul>
+        <li>Graficar la traza con \(y=0\) en el plano \(xy\) en vez del \(xz\).</li>
+        <li>Dibujar \(\dfrac{x^2}{4}+\dfrac{z^2}{16}=1\) como circunferencia: los semiejes son distintos (2 y 4).</li>
+        <li>Llegar a la ecuación y no decir qué curva es, o no clasificar la superficie.</li>
+        <li>Quedarse con dos trazas: son tres por superficie, seis en total.</li></ul></div>
+    </div>
+    <div class="tools"><button class="btn primary" data-verej="tra">Ver la resolución paso a paso →</button></div>
+  </div>
+  <div class="pager"><button class="btn" data-ir="mapa">← Mapa</button><button class="btn primary" data-ir="lin">Practicar: ED lineales →</button></div>
+</section>
+
+<!-- ======================= PESTAÑA 1 · LINEALES ======================= -->
+<section id="tab-lin" class="tab-content">
+  <div class="banner">
+    <div class="kick">Unidad 1 · Ecuaciones diferenciales</div>
+    <h1>Ecuaciones diferenciales lineales de primer orden</h1>
+    <p>Son las ecuaciones que se pueden escribir como \(y'+P(x)\,y=Q(x)\). Se resuelven multiplicando por un <strong>factor integrante</strong> que convierte el lado izquierdo en la derivada de un producto.</p>
+    <div class="wm">y′ + Py</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">1</span><h2>Lo esencial</h2></div>
+    <div class="grid2">
+      <div>
+        <div class="box def"><span class="bt">Forma normal y factor integrante</span>
+          Una ED lineal de primer orden se escribe
+          \[y'+P(x)\,y=Q(x)\]
+          Se busca una función \(\varphi(x)\) tal que al multiplicar toda la ecuación por ella, el lado izquierdo sea la derivada del producto \(\varphi\,y\):
+          \[\varphi\,y'+\varphi\,P\,y=(\varphi\,y)'\quad\Longleftrightarrow\quad\varphi'=P\,\varphi\]
+          Esa última ecuación es separable y da \(\varphi(x)=\ee^{\int P(x)\,\dd x}\) (sin constante).</div>
+        <div class="box voz"><span class="bt">El método, paso a paso</span>
+          <ol>
+            <li><strong>Forma normal:</strong> dividir por lo que acompaña a \(y'\) hasta que su coeficiente sea 1. Identificar \(P(x)\) y \(Q(x)\).</li>
+            <li><strong>Factor integrante:</strong> plantear \(\varphi'=P\,\varphi\), separar variables e integrar: \(\ln\varphi=\int P\,\dd x\), de donde sale \(\varphi\).</li>
+            <li><strong>Multiplicar</strong> la ecuación en forma normal por \(\varphi\) y reconocer que el lado izquierdo es \((\varphi\,y)'\).</li>
+            <li><strong>Integrar</strong> los dos lados: \(\varphi\,y=\int\varphi\,Q\,\dd x+C\).</li>
+            <li><strong>Despejar</strong> \(y\) dividiendo todo por \(\varphi\). Esa es la solución general.</li>
+            <li><strong>Condición inicial:</strong> reemplazar el punto en la general y despejar \(C\).</li>
+          </ol></div>
+      </div>
+      <div>
+        <div class="box err"><span class="bt">El error más frecuente: leer \(P(x)\) antes de pasar a la forma normal</span>
+          En \(x\,y'-2y=x^4-x^2\) el coeficiente de \(y\) es \(-2\), pero <em>no</em> es \(P(x)\), porque \(y'\) está multiplicada por \(x\).
+          <div class="grid2 malbien">
+            <div class="mb mal"><span class="mbt">✗ Así no</span>\(P(x)=-2\), entonces \(\varphi=\ee^{\int-2\,\dd x}=\ee^{-2x}\). Al multiplicar, el lado izquierdo \(x\,\ee^{-2x}y'-2\ee^{-2x}y\) no es la derivada de ningún producto, y la cuenta no cierra.</div>
+            <div class="mb bien"><span class="mbt">✓ Así sí</span>Dividir por \(x\): \(y'-\dfrac{2}{x}\,y=x^3-x\). Ahora \(P(x)=-\dfrac{2}{x}\) y \(\varphi=\ee^{\int-\frac{2}{x}\dd x}=\ee^{-2\ln x}=x^{-2}\). Multiplicando: \((x^{-2}y)'=x-x^{-1}\).</div>
+          </div></div>
+        <div class="box def"><span class="bt">Cuando hay un logaritmo en el exponente</span>
+          \(\ee^{a\ln x}=\ee^{\ln x^a}=x^a\). Por eso, si \(P(x)=\dfrac{a}{x}\), el factor integrante es \(\varphi=x^{a}\): con \(P=\dfrac{3}{x}\) queda \(x^3\); con \(P=-\dfrac{2}{x}\) queda \(x^{-2}\).</div>
+        <div class="acc" id="acc-formula"><div class="acc-h" tabindex="0"><span class="acc-t">La fórmula resumida (y por qué es lo mismo)</span><span class="chev">▼</span></div><div class="acc-b">
+          <p>Si se hacen los pasos 3, 4 y 5 en general, se llega a una fórmula cerrada:</p>
+          \[y=\frac{1}{\varphi}\left[\int\varphi\,Q\,\dd x+C\right]\qquad\text{con }\varphi=\ee^{\int P\,\dd x}\]
+          <p>Algunos la recuerdan como "\(y=u\cdot v\)", con \(u=\dfrac{1}{\varphi}=\ee^{-\int P\,\dd x}\) y \(v=\int\varphi\,Q\,\dd x+C\). Es exactamente el método del factor integrante, solo que empaquetado. Si la usás, tiene que estar bien recordada: el signo del exponente de \(u\) es negativo y la \(C\) va <em>adentro</em> del corchete, multiplicada después por \(\dfrac{1}{\varphi}\). Para el parcial, lo más seguro es escribir los pasos: si te olvidás la fórmula, el método igual te lleva al resultado.</p>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">2</span><h2>Ejemplos resueltos</h2></div>
+    <p class="nota">El primero es el ejercicio 1 del parcial, tal como se tomó.</p>
+    <div id="ej-lin"></div>
+  </div>
+
+  <div class="card pr">
+    <div class="sec-h"><span class="num">3</span><h2>Práctica</h2></div>
+    <p class="nota">Resolvé en papel la solución general y la particular. Para comprobar, ingresá el valor que pide cada ejercicio (con coma o punto decimal, al menos dos decimales si no es exacto). Si te trabás, abrí la pista; la resolución completa se habilita después del primer intento.</p>
+    <div id="prac-lin"></div>
+  </div>
+  <div class="pager"><button class="btn" data-ir="par">← El parcial</button><button class="btn primary" data-ir="sep">ED separables →</button></div>
+</section>
+
+<!-- ======================= PESTAÑA 2 · SEPARABLES ======================= -->
+<section id="tab-sep" class="tab-content">
+  <div class="banner">
+    <div class="kick">Unidad 1 · Ecuaciones diferenciales</div>
+    <h1>Ecuaciones diferenciales de variables separables</h1>
+    <p>Cuando la ecuación se puede acomodar con todo lo que tiene \(y\) de un lado y todo lo que tiene \(x\) del otro, se integra cada lado por separado. Es el método que conviene <strong>probar primero</strong>; si no se puede separar, se mira si es lineal.</p>
+    <div class="wm">g(y)dy</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">1</span><h2>Lo esencial</h2></div>
+    <div class="grid2">
+      <div>
+        <div class="box def"><span class="bt">Ecuación separable</span>
+          Es la que se puede escribir como
+          \[g(y)\,\dd y=h(x)\,\dd x\]
+          Integrando los dos lados queda \(\displaystyle\int g(y)\,\dd y=\int h(x)\,\dd x+C\), que es la solución general (a veces en forma implícita). Una sola constante, de un solo lado.</div>
+        <div class="box voz"><span class="bt">El método, paso a paso</span>
+          <ol>
+            <li>Escribir \(y'\) como \(\dfrac{\dd y}{\dd x}\) y <strong>separar</strong>: lo que tiene \(y\) con \(\dd y\), lo que tiene \(x\) con \(\dd x\). Si hace falta dividir por una expresión, anotar que no puede ser cero.</li>
+            <li><strong>Integrar</strong> cada lado. La constante \(C\) va una sola vez.</li>
+            <li>Si se puede, <strong>despejar</strong> \(y\). Si aparece \(\ln|y|\), al aplicar la exponencial la constante \(\ee^{C}\) se renombra \(K\).</li>
+            <li>Con una <strong>condición inicial</strong>, reemplazar el punto y despejar la constante.</li>
+          </ol></div>
+      </div>
+      <div>
+        <div class="box err"><span class="bt">Los errores más frecuentes</span>
+          <ul>
+            <li>Separar "a medias": dejar una \(x\) del lado de \(\dd y\). Si no se puede llevar todo a cada lado, la ecuación no es separable.</li>
+            <li>Poner una constante de cada lado y después tratarlas como distintas: se juntan en una sola.</li>
+            <li>Integrar \(\dfrac{1}{y}\) como \(\ln y\) sin el módulo, y después perder las soluciones con \(y<0\).</li>
+            <li>Olvidar que \(\ee^{\ln|y|+C}=\ee^{C}\,|y|\): la constante sale multiplicando, no sumando.</li>
+          </ul></div>
+        <div class="box def"><span class="bt">Separable o lineal: ¿cuál es cuál?</span>
+          \(y'=x\,y\) es separable (\(\dfrac{1}{y}\,\dd y=x\,\dd x\)) <em>y también</em> lineal (\(y'-x\,y=0\)): se puede resolver de las dos maneras. En cambio \(x\,y'-2y=x^4-x^2\) no se puede separar porque el término \(x^4-x^2\) no se deja multiplicar ni dividir con el resto: es solo lineal. Y \(y'=x+y^2\) no es ni una cosa ni la otra.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">2</span><h2>Ejemplos resueltos</h2></div>
+    <div id="ej-sep"></div>
+  </div>
+
+  <div class="card pr">
+    <div class="sec-h"><span class="num">3</span><h2>Práctica</h2></div>
+    <p class="nota">Resolvé en papel con la condición inicial. Para comprobar, ingresá el valor que pide cada ejercicio (con coma o punto decimal, al menos dos decimales si no es exacto).</p>
+    <div id="prac-sep"></div>
+  </div>
+  <div class="pager"><button class="btn" data-ir="lin">← ED lineales</button><button class="btn primary" data-ir="ver">Verificar, orden y grado →</button></div>
+</section>
+
+<!-- ======================= PESTAÑA 3 · VERIFICAR ======================= -->
+<section id="tab-ver" class="tab-content">
+  <div class="banner">
+    <div class="kick">Unidad 1 · Ecuaciones diferenciales</div>
+    <h1>Verificar una solución, orden y grado</h1>
+    <p>Verificar es <strong>derivar y sustituir</strong>: si al reemplazar la función y sus derivadas en la ecuación queda una identidad válida para todo \(x\), la función es solución. Orden y grado se leen de la ecuación, no de la función.</p>
+    <div class="wm">y″ + y</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">1</span><h2>Lo esencial</h2></div>
+    <div class="grid2">
+      <div>
+        <div class="box def"><span class="bt">Orden y grado</span>
+          <strong>Orden:</strong> el de la derivada más alta que aparece. \(y''-4y'=0\) es de orden 2.<br>
+          <strong>Grado:</strong> la potencia a la que está elevada la derivada de mayor orden, una vez que la ecuación está escrita como polinomio en las derivadas. \((y')^3-8x^3=0\) es de orden 1 y grado 3; \(y''+(y')^5=0\) es de orden 2 y grado 1, porque la que manda es \(y''\).</div>
+        <div class="box def"><span class="bt">Solución general y particular</span>
+          La <strong>solución general</strong> de una ED de orden \(n\) tiene \(n\) constantes arbitrarias independientes: es la familia de todas las soluciones. Una <strong>solución particular</strong> es una de esas funciones, con las constantes ya fijadas (por ejemplo, por una condición inicial). Si la función no tiene constantes arbitrarias, es particular.</div>
+      </div>
+      <div>
+        <div class="box voz"><span class="bt">Cómo verificar, paso a paso</span>
+          <ol>
+            <li>Calcular las derivadas que pide la ecuación (hasta el orden que aparece), aparte y prolijas.</li>
+            <li>Reemplazar \(y\), \(y'\), \(y''\)… en la ecuación, <em>sin simplificar todavía</em>.</li>
+            <li>Operar hasta ver si queda una identidad (\(0=0\), o la misma expresión de los dos lados).</li>
+            <li>Concluir: si la identidad vale para todo \(x\), es solución; si queda algo que depende de \(x\) (o un número distinto de cero), no lo es.</li>
+          </ol></div>
+        <div class="box err"><span class="bt">El error más frecuente</span>
+          Reemplazar un valor de \(x\) y ver que "da", o reemplazar solo \(y\) y no sus derivadas. La verificación es con la función completa, para todo \(x\). Y si en el camino la función no verifica, decirlo: "no es solución" también es una respuesta correcta.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">2</span><h2>Ejemplos resueltos</h2></div>
+    <p class="nota">El primero es el ejercicio 2 del parcial, tal como se tomó; el segundo es el del modelo de parcial.</p>
+    <div id="ej-ver"></div>
+  </div>
+
+  <div class="card pr">
+    <div class="sec-h"><span class="num">3</span><h2>Práctica</h2></div>
+    <p class="nota">Hacé la verificación en papel y después completá las cuatro respuestas de cada ejercicio. Se corrigen todas juntas.</p>
+    <div id="prac-ver"></div>
+  </div>
+  <div class="pager"><button class="btn" data-ir="sep">← ED separables</button><button class="btn primary" data-ir="dom">Dominio →</button></div>
+</section>
+
+<!-- ======================= PESTAÑA 4 · DOMINIO ======================= -->
+<section id="tab-dom" class="tab-content">
+  <div class="banner">
+    <div class="kick">Unidad 2 · Campos escalares</div>
+    <h1>Dominio de un campo escalar</h1>
+    <p>El dominio es el conjunto de los \((x\,;\,y)\) para los que la fórmula se puede calcular. Se arma con una tabla: qué operaciones hay, cuáles se pueden hacer siempre y qué <strong>condición</strong> impone cada una que no.</p>
+    <div class="wm">D ⊆ ℝ²</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">1</span><h2>Lo esencial</h2></div>
+    <div class="grid2">
+      <div>
+        <div class="box def"><span class="bt">La tabla de operaciones</span>
+          <div class="tbl"><table><thead><tr><th>Operación</th><th>¿Se puede hacer siempre?</th><th>Condición</th></tr></thead><tbody>
+            <tr><td>Suma, resta, producto, potencia natural</td><td>Sí</td><td>—</td></tr>
+            <tr><td>División \(\dfrac{A}{B}\)</td><td>No</td><td>\(B\ne0\)</td></tr>
+            <tr><td>Raíz de índice par \(\sqrt{A}\)</td><td>No</td><td>\(A\ge0\)</td></tr>
+            <tr><td>Logaritmo \(\ln A\)</td><td>No</td><td>\(A>0\)</td></tr>
+            <tr><td>Raíz de índice impar \(\sqrt[3]{A}\)</td><td>Sí</td><td>—</td></tr>
+          </tbody></table></div>
+          El dominio es el conjunto de puntos que cumplen <strong>todas</strong> las condiciones a la vez: \(D=\{(x\,;\,y)\in\mathbb{R}^2\,/\,\text{cond. 1}\wedge\text{cond. 2}\}\).</div>
+        <div class="box voz"><span class="bt">Cómo graficar cada condición</span>
+          <ul>
+            <li>Primero la <strong>frontera</strong>: la curva que resulta de cambiar la desigualdad por un igual (\(x^2+y^2=16\), \(y=2\), \(y=x^2\)). Reconocer qué curva es: recta, circunferencia, parábola…</li>
+            <li>Después, de qué lado queda la región: probar con un punto cómodo que no esté sobre la frontera (el \((0\,;\,0)\) si sirve) y ver si cumple la desigualdad.</li>
+            <li>La frontera va con trazo <strong>continuo</strong> si pertenece (\(\ge\), \(\le\)) y <strong>punteado</strong> si no (\(>\), \(<\)). Una condición \(B\ne0\) quita una curva: se dibuja punteada.</li>
+            <li>El dominio es la <strong>intersección</strong> de las regiones: lo que cumple todo.</li>
+          </ul></div>
+      </div>
+      <div>
+        <div class="box err"><span class="bt">Los errores más frecuentes</span>
+          <ul>
+            <li>Escribir una sola condición cuando la fórmula tiene dos operaciones problemáticas (raíz <em>y</em> división).</li>
+            <li>Confundir \(\ge\) con \(>\): la raíz admite el cero (\(\sqrt{0}=0\)), el logaritmo y el denominador no.</li>
+            <li>Elegir mal el lado: \(x^2+y^2-16\ge0\) es el <em>exterior</em> de la circunferencia (el \((0\,;\,0)\) da \(-16\), no cumple).</li>
+            <li>Olvidar la recta que excluye el denominador, o dibujarla continua.</li>
+          </ul></div>
+        <div class="box def"><span class="bt">Cómo se lee el gráfico</span>
+          <div class="leyenda"><span class="fill" style="--c:#1d6fcc">región que pertenece al dominio</span><span style="--c:#0f2244">frontera incluida</span><span class="dash" style="--c:#be123c">frontera o recta excluida</span></div>
+          Y al lado, en palabras: "el dominio son los puntos de afuera de la circunferencia, con la circunferencia incluida, salvo los de la recta \(y=2\)".</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">2</span><h2>Ejemplos resueltos</h2></div>
+    <p class="nota">El primero es el ejercicio 3 del parcial; el segundo, el del modelo de parcial.</p>
+    <div id="ej-dom"></div>
+  </div>
+
+  <div class="card pr">
+    <div class="sec-h"><span class="num">3</span><h2>Práctica</h2></div>
+    <p class="nota">Armá en papel la tabla, el conjunto y el gráfico. Para comprobar, respondé si cada curva indicada pertenece o no al dominio; después compará tu gráfico con el de la resolución.</p>
+    <div id="prac-dom"></div>
+  </div>
+  <div class="pager"><button class="btn" data-ir="ver">← Verificar</button><button class="btn primary" data-ir="tra">Trazas →</button></div>
+</section>
+
+<!-- ======================= PESTAÑA 5 · TRAZAS ======================= -->
+<section id="tab-tra" class="tab-content">
+  <div class="banner">
+    <div class="kick">Unidad 2 · Superficies</div>
+    <h1>Trazas de superficies</h1>
+    <p>La traza de una superficie con un plano es la curva donde se cortan. Con los planos coordenados se obtiene haciendo \(z=0\), \(y=0\) o \(x=0\) en la ecuación: queda una ecuación en dos variables, que es una curva conocida (o no hay traza).</p>
+    <div class="wm">z = 0</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">1</span><h2>Lo esencial</h2></div>
+    <div class="grid2">
+      <div>
+        <div class="box def"><span class="bt">Las tres trazas con los planos coordenados</span>
+          <div class="tbl"><table><thead><tr><th>Plano</th><th>Se hace</th><th>La traza vive en</th></tr></thead><tbody>
+            <tr><td>\(xy\)</td><td>\(z=0\)</td><td>el plano \(xy\): ecuación en \(x\), \(y\)</td></tr>
+            <tr><td>\(xz\)</td><td>\(y=0\)</td><td>el plano \(xz\): ecuación en \(x\), \(z\)</td></tr>
+            <tr><td>\(yz\)</td><td>\(x=0\)</td><td>el plano \(yz\): ecuación en \(y\), \(z\)</td></tr>
+          </tbody></table></div>
+          Se escribe como sistema: la ecuación de la superficie y la del plano, y se reemplaza una en la otra.</div>
+        <div class="box voz"><span class="bt">Cómo reconocer la curva que queda</span>
+          <ul>
+            <li><strong>Recta:</strong> las dos variables a la primera potencia (\(2x+3y=6\)), o una sola (\(x=-4\), \(z=2\)).</li>
+            <li><strong>Circunferencia:</strong> \(u^2+v^2=r^2\). <strong>Elipse:</strong> \(\dfrac{u^2}{a^2}+\dfrac{v^2}{b^2}=1\) con \(a\ne b\).</li>
+            <li><strong>Hipérbola:</strong> \(\dfrac{u^2}{a^2}-\dfrac{v^2}{b^2}=1\) (o con los signos al revés).</li>
+            <li><strong>Parábola:</strong> una variable al cuadrado y la otra a la primera (\(z=x^2-4\)).</li>
+            <li><strong>No hay traza:</strong> queda algo sin solución real, como \(-\dfrac{y^2}{16}=1\) o \(u^2+v^2=-4\). <strong>Un punto:</strong> \(u^2+v^2=0\).</li>
+          </ul></div>
+      </div>
+      <div>
+        <div class="box def"><span class="bt">Las superficies que aparecen</span>
+          <div class="tbl"><table><thead><tr><th>Ecuación</th><th>Superficie</th></tr></thead><tbody>
+            <tr><td>\(ax+by+cz=d\)</td><td>plano (si falta una variable, es paralelo a ese eje)</td></tr>
+            <tr><td>\(x^2+y^2+z^2=r^2\)</td><td>esfera</td></tr>
+            <tr><td>\(\dfrac{x^2}{a^2}+\dfrac{y^2}{b^2}+\dfrac{z^2}{c^2}=1\)</td><td>elipsoide</td></tr>
+            <tr><td>\(z=x^2+y^2\) (o con una variable despejada)</td><td>paraboloide</td></tr>
+            <tr><td>\(\dfrac{x^2}{a^2}+\dfrac{y^2}{b^2}-\dfrac{z^2}{c^2}=1\)</td><td>hiperboloide de una hoja</td></tr>
+            <tr><td>\(\dfrac{x^2}{a^2}-\dfrac{y^2}{b^2}-\dfrac{z^2}{c^2}=1\)</td><td>hiperboloide de dos hojas</td></tr>
+            <tr><td>\(x^2+y^2=r^2\) (sin \(z\))</td><td>cilindro circular, eje \(z\)</td></tr>
+          </tbody></table></div></div>
+        <div class="box err"><span class="bt">El error más frecuente</span>
+          Llegar a \(-\dfrac{y^2}{16}=1\) y dejarlo ahí, o decir "la traza es una recta vertical". Si no hay ningún \(y\) real que cumpla, la conclusión es: <strong>la superficie no corta el plano \(yz\)</strong>, no hay traza. Decirlo vale puntos; no decirlo los pierde.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-h"><span class="num">2</span><h2>Ejemplos resueltos</h2></div>
+    <p class="nota">Los dos son los del ejercicio 4 del parcial: el plano y el elipsoide.</p>
+    <div id="ej-tra"></div>
+  </div>
+
+  <div class="card pr">
+    <div class="sec-h"><span class="num">3</span><h2>Práctica</h2></div>
+    <p class="nota">Plantéa en papel los tres sistemas, obtené las tres ecuaciones y graficá cada traza en su plano. Para comprobar, elegí qué curva es cada traza; después compará tus gráficos con los de la resolución.</p>
+    <div id="prac-tra"></div>
+  </div>
+  <div class="pager"><button class="btn" data-ir="dom">← Dominio</button><button class="btn primary" data-ir="sim">Simulacros →</button></div>
+</section>
+
+<!-- ======================= PESTAÑA 6 · SIMULACROS ======================= -->
+<section id="tab-sim" class="tab-content">
+  <div class="banner">
+    <div class="kick">Para hacer en papel, como en el examen</div>
+    <h1>Dos simulacros de recuperatorio</h1>
+    <p>Cada simulacro tiene <strong>cinco ejercicios del nivel del parcial, uno por tema</strong>. El recuperatorio puede tener otra cantidad y otro reparto; lo que no cambia es el nivel. Hacelo completo en papel, sin mirar las resoluciones, y recién después comprobá. Si un ejercicio no te sale, volvé a la pestaña de ese tema.</p>
+    <div class="wm">Tema</div>
+  </div>
+  <div class="card pr" id="sim-a">
+    <div class="sim-h"><span class="sim-tag">Simulacro A</span><h2>Tema A</h2></div>
+    <div id="prac-simA"></div>
+  </div>
+  <div class="card pr" id="sim-b">
+    <div class="sim-h"><span class="sim-tag">Simulacro B</span><h2>Tema B</h2></div>
+    <div id="prac-simB"></div>
+  </div>
+  <div class="card">
+    <div class="sec-h"><h2>Para cerrar</h2></div>
+    <ul>
+      <li><strong>Separables:</strong> separar (anotando por qué se puede dividir) → integrar cada lado con una sola \(C\) → despejar si se puede → condición inicial.</li>
+      <li><strong>Lineales:</strong> forma normal → factor integrante → derivada de un producto → integrar con \(C\) → despejar → condición inicial.</li>
+      <li><strong>Verificar:</strong> derivar, sustituir, concluir. Orden: derivada más alta. Grado: su potencia. General: tantas constantes como el orden; particular: ninguna.</li>
+      <li><strong>Dominio:</strong> tabla de operaciones → una condición por cada operación problemática → conjunto con \(\wedge\) → frontera continua o punteada → región.</li>
+      <li><strong>Trazas:</strong> tres sistemas, tres ecuaciones, tres gráficos, tres nombres. Si no hay solución real, no hay traza.</li>
+    </ul>
+    <div class="tools"><button class="btn" id="btn-reiniciar">Borrar mi progreso</button></div>
+  </div>
+  <div class="pager"><button class="btn" data-ir="tra">← Trazas</button><span></span></div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-quote">"La matemática no exige genios, exige constancia."</div>
+    <div class="footer-lab">
+      <div class="lab-name"><span class="bullet"></span><span class="lab">laboratorio</span><span class="best">best</span><span class="ia">-IA</span></div>
+      <div class="lab-sub">Prof. Ariel L. Cardozo Delgado</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+'use strict';
+/* ================= estado ================= */
+const CLAVE = 'lab_am2_practica_recup1_2652_v1';
+let E = { ejercicios:{} };
+function guardar(){ try{ localStorage.setItem(CLAVE, JSON.stringify(E)); }catch(e){} }
+function cargar(){ try{ const c = localStorage.getItem(CLAVE); if(c) E = Object.assign({ejercicios:{}}, JSON.parse(c)); }catch(e){} }
+const $ = id => document.getElementById(id);
+const $$ = (s, r) => Array.from((r||document).querySelectorAll(s));
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const lin = (n,a,b) => Array.from({length:n}, (_,i) => a+(b-a)*i/(n-1));
+const R_ = String.raw;
+const fmt = (v, d) => {
+  if(!isFinite(v)) return '—';
+  if(d === undefined){ const a = Math.abs(v); d = a === 0 ? 0 : a >= 100 ? 1 : a >= 10 ? 2 : a >= 1 ? 3 : a >= 0.01 ? 4 : 5; }
+  let s = (Math.round(v*10**d)/10**d).toFixed(d); if(s.includes('.')) s = s.replace(/\.?0+$/, '');
+  if(s === '-0' || s === '') s = '0';
+  return s.replace('-', '−').replace('.', ',');
+};
+
+/* ================= mini-TeX → HTML (STIX, cursiva solo en variables, fracciones apiladas, radical SVG) ================= */
+const TEX_SYM = { cdot:' · ', times:' × ', to:' → ', approx:' ≈ ', le:' ≤ ', leq:' ≤ ', ge:' ≥ ', geq:' ≥ ', ne:' ≠ ', neq:' ≠ ', infty:'∞', partial:'∂', nabla:'∇', pm:' ± ', ldots:'…', in:' ∈ ', quad:'&ensp;', qquad:'&emsp;', prime:'′', Delta:'Δ', pi:'π', Rightarrow:' ⇒ ', Longrightarrow:' ⟹ ', Longleftrightarrow:' ⟺ ', Leftrightarrow:' ⇔ ', mapsto:' ↦ ', circ:'°', wedge:' ∧ ', vee:' ∨ ', int:'∫', subseteq:' ⊆ ', subset:' ⊂ ', notin:' ∉ ', forall:'∀', emptyset:'∅', varnothing:'∅' };
+const TEX_GREEK = { alpha:'α', beta:'β', theta:'θ', rho:'ρ', lambda:'λ', mu:'μ', phi:'φ', varphi:'φ', sigma:'σ', tau:'τ', delta:'δ', gamma:'γ', omega:'ω' };
+const TEX_OPS = ['sin','cos','tan','sen','tg','ln','log','exp','lim','max','min','det','arctg','arcsen','arccos','arctan'];
+const SVG_RAD = '<svg viewBox="0 0 22 40" preserveAspectRatio="none" aria-hidden="true"><path d="M1 25 L6.5 22.5 L11.5 37 L21 1.2" fill="none" stroke="currentColor" stroke-width="1.35" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+const SVG_LLAVE = '<svg viewBox="0 0 10 100" preserveAspectRatio="none" aria-hidden="true"><path d="M9.2 1.2 C4.6 1.6 5 6 5 14 L5 40 C5 46 4 49.4 1 50 C4 50.6 5 54 5 60 L5 86 C5 94 4.6 98.4 9.2 98.8" fill="none" stroke="currentColor" stroke-width="1.3" vector-effect="non-scaling-stroke" stroke-linecap="round"/></svg>';
+function splitTop(s, sep){ const out=[]; let depth=0, cur='', i=0; while(i<s.length){ const c=s[i]; if(c==='{') depth++; else if(c==='}') depth--; if(depth===0 && s.startsWith(sep,i)){ out.push(cur); cur=''; i+=sep.length; continue; } cur+=c; i++; } out.push(cur); return out; }
+function texToHtml(s){
+  let i = 0; let last = 'open'; let out = '';
+  const esc = c => c === '<' ? '&lt;' : c === '>' ? '&gt;' : c === '&' ? '&amp;' : c;
+  const readGroup = () => { let depth = 0, j = i; for(; j < s.length; j++){ if(s[j] === '{') depth++; else if(s[j] === '}'){ depth--; if(depth === 0) break; } } const inner = s.slice(i+1, j); i = j+1; return inner; };
+  const readArg = () => { while(s[i] === ' ') i++; if(s[i] === '{') return readGroup(); if(s[i] === '\\'){ let j = i+1; while(j < s.length && /[a-zA-Z]/.test(s[j])) j++; if(j === i+1) j++; const t = s.slice(i, j); i = j; return t; } const c = s[i]; i++; return c; };
+  const push = (h, kind) => { out += h; last = kind; };
+  while(i < s.length){
+    const c = s[i];
+    if(c === ' ' || c === '\n' || c === '\t'){ i++; continue; }
+    if(c === '{'){ push(texToHtml(readGroup()), 'atom'); continue; }
+    if(c === '}'){ i++; continue; }
+    if(c === '^'){ i++; push('<sup>' + texToHtml(readArg()) + '</sup>', 'atom'); continue; }
+    if(c === '_'){ i++; push('<sub>' + texToHtml(readArg()) + '</sub>', 'atom'); continue; }
+    if(c === '\\'){
+      let j = i+1; while(j < s.length && /[a-zA-Z]/.test(s[j])) j++;
+      let cmd; if(j === i+1){ cmd = s[i+1]; i += 2; } else { cmd = s.slice(i+1, j); i = j; }
+      if(cmd === ',' || cmd === ';' || cmd === ' '){ out += '&thinsp;'; continue; }
+      if(cmd === '!') continue;
+      if(cmd === '{' || cmd === '}' || cmd === '%' || cmd === '|'){ push(cmd==='|'?'|':esc(cmd), 'atom'); continue; }
+      if(cmd === 'frac' || cmd === 'dfrac' || cmd === 'tfrac'){ const a = readArg(), b = readArg(); push(`<span class="fr${cmd==='tfrac'?' sm':''}"><span class="fn">${texToHtml(a)}</span><span class="fd">${texToHtml(b)}</span></span>`, 'atom'); continue; }
+      if(cmd === 'sqrt'){ let idx=''; while(s[i]===' ') i++; if(s[i]==='['){ const k=s.indexOf(']',i); idx=s.slice(i+1,k); i=k+1; } const a = readArg(); push(`<span class="rt">${idx?`<sup style="margin-right:-.35em;position:relative;top:-.55em;font-size:.6em">${texToHtml(idx)}</sup>`:''}<span class="sg">${SVG_RAD}</span><span class="rd"><span class="in">${texToHtml(a)}</span></span></span>`, 'atom'); continue; }
+      if(cmd === 'sis'){ const a = readArg(); const filas = splitTop(a, '\\\\'); push(`<span class="sis"><span class="llave-w">${SVG_LLAVE}</span><span class="sis-l">${filas.map(f=>`<span class="sis-r">${texToHtml(f.trim())}</span>`).join('')}</span></span>`, 'atom'); continue; }
+      if(cmd === 'text'){ const a = readArg(); push('<span class="tx">' + a.replace(/[<>&]/g, esc) + '</span>', 'atom'); continue; }
+      if(cmd === 'mathbb'){ const a = readArg(); push('<span class="op">' + ({R:'ℝ',N:'ℕ',Z:'ℤ'}[a]||a) + '</span>', 'atom'); continue; }
+      if(cmd === 'dd'){ push('<span class="op">d</span>', 'atom'); continue; }
+      if(cmd === 'ee'){ push('<span class="op">e</span>', 'atom'); continue; }
+      if(cmd === 'left'){ let d = s[i]; i++; if(d === '\\'){ d = s[i]; i++; } let depth = 1, j2 = i; while(j2 < s.length){ if(s.startsWith('\\left', j2)) depth++; if(s.startsWith('\\right', j2)){ depth--; if(depth === 0) break; } j2++; }
+        const inner = s.slice(i, j2); i = j2 + 6; let dr = s[i]; i++; if(dr === '\\'){ dr = s[i]; i++; }
+        push(`<span class="par"><span class="pl">${d==='.'?'':esc(d)}</span><span class="in">${texToHtml(inner)}</span><span class="pr">${dr==='.'?'':esc(dr)}</span></span>`, 'atom'); continue; }
+      if(['big','Big','bigl','bigr','displaystyle'].includes(cmd)) continue;
+      if(TEX_OPS.includes(cmd)){ push((last==='atom'?'&thinsp;':'') + '<span class="op">' + cmd + '</span>&thinsp;', 'atom'); continue; }
+      if(TEX_SYM[cmd] !== undefined){ const v = TEX_SYM[cmd]; push(v, v.startsWith(' ') ? 'op' : (cmd==='int'?'open':'atom')); continue; }
+      if(TEX_GREEK[cmd]){ push('<i>' + TEX_GREEK[cmd] + '</i>', 'atom'); continue; }
+      push(cmd, 'atom'); continue;
+    }
+    i++;
+    if(/[a-zA-Z]/.test(c)){ push('<i>' + c + '</i>', 'atom'); continue; }
+    if(/[0-9.]/.test(c)){ push(c, 'atom'); continue; }
+    if(c === '-'){ if(last === 'atom') push(' − ', 'op'); else push('−', 'open'); continue; }
+    if(c === '+'){ if(last === 'atom') push(' + ', 'op'); else push('+', 'open'); continue; }
+    if(c === '='){ push(' = ', 'op'); continue; }
+    if(c === '<' || c === '>'){ push(' ' + esc(c) + ' ', 'op'); continue; }
+    if(c === '(' || c === '['){ push(c, 'open'); continue; }
+    if(c === ')' || c === ']'){ push(c, 'atom'); continue; }
+    if(c === '|'){ push('|', last==='atom'?'atom':'open'); continue; }
+    if(c === "'"){ push('′', 'atom'); continue; }
+    if(c === ','){ push(',', last === 'atom' ? 'atom' : 'open'); continue; }
+    if(c === ';'){ push(';&thinsp;', 'open'); continue; }
+    if(c === ':'){ push(' : ', 'op'); continue; }
+    if(c === '/'){ push(' / ', 'op'); continue; }
+    push(esc(c), 'atom');
+  }
+  return out;
+}
+const mi = t => `<span class="mi">${texToHtml(t)}</span>`;
+function renderMath(root){
+  root = root || document.body;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n => (n.parentElement && !['SCRIPT','STYLE','TEXTAREA','OPTION'].includes(n.parentElement.tagName) && /\\[\(\[]/.test(n.textContent)) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT });
+  const nodos = []; let n; while((n = walker.nextNode())) nodos.push(n);
+  for(const nodo of nodos){
+    const txt = nodo.textContent; const re = /\\\[([\s\S]*?)\\\]|\\\(([\s\S]*?)\\\)/g;
+    let m, lastIdx = 0; const frag = document.createDocumentFragment();
+    while((m = re.exec(txt))){
+      if(m.index > lastIdx) frag.appendChild(document.createTextNode(txt.slice(lastIdx, m.index)));
+      const span = document.createElement('span');
+      if(m[1] !== undefined){ span.className = 'md'; span.innerHTML = texToHtml(m[1]); } else { span.className = 'mi'; span.innerHTML = texToHtml(m[2]); }
+      frag.appendChild(span); lastIdx = m.index + m[0].length;
+    }
+    if(lastIdx < txt.length) frag.appendChild(document.createTextNode(txt.slice(lastIdx)));
+    nodo.parentNode.replaceChild(frag, nodo);
+  }
+}
+
+/* ================= canvas: utilidades ================= */
+function prepararCanvas(cv, alto){
+  const dpr = window.devicePixelRatio || 1; const h = alto;
+  const w = cv.clientWidth || cv.parentElement.clientWidth || 360;
+  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr); cv.style.height = h+'px';
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.fillStyle='#fff'; ctx.fillRect(0,0,w,h);
+  return {ctx,w,h};
+}
+function geoIgual(w,h,cx,cy,half){ const l=34,t=14,r=14,b=34; const gw=w-l-r,gh=h-t-b; const k=Math.min(gw,gh)/(2*half); return {l,t,w:gw,h:gh,xmin:cx-gw/(2*k),xmax:cx+gw/(2*k),ymin:cy-gh/(2*k),ymax:cy+gh/(2*k),k}; }
+function marcas(a,b,n=6){ const paso0=(b-a)/n; const p10=10**Math.floor(Math.log10(paso0)); const paso=[1,2,2.5,5,10].map(k=>k*p10).find(k=>k>=paso0*0.999); const r=[]; for(let v=Math.ceil(a/paso-1e-9)*paso; v<=b+1e-9; v+=paso) r.push(Math.abs(v)<1e-12?0:v); return r; }
+/* ejes cartesianos centrados, con marcas enteras, rótulos u (horizontal) y v (vertical) */
+function dibujarEjesXY(ctx, geo, etU, etV){
+  const {l,t,w,h,xmin,xmax,ymin,ymax} = geo;
+  const X = x => l + (x-xmin)/(xmax-xmin)*w, Y = y => t + h - (y-ymin)/(ymax-ymin)*h;
+  ctx.strokeStyle='rgba(148,163,184,.3)'; ctx.lineWidth=1; ctx.fillStyle='#64748b'; ctx.font='11px Outfit, sans-serif';
+  const mx=marcas(xmin,xmax), my=marcas(ymin,ymax);
+  mx.forEach(v=>{ ctx.beginPath(); ctx.moveTo(X(v),t); ctx.lineTo(X(v),t+h); ctx.stroke(); });
+  my.forEach(v=>{ ctx.beginPath(); ctx.moveTo(l,Y(v)); ctx.lineTo(l+w,Y(v)); ctx.stroke(); });
+  ctx.strokeStyle='#334155'; ctx.lineWidth=1.3;
+  ctx.beginPath(); ctx.moveTo(l,Y(0)); ctx.lineTo(l+w,Y(0)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(0),t); ctx.lineTo(X(0),t+h); ctx.stroke();
+  ctx.fillStyle='#475569'; ctx.font='11px Outfit, sans-serif'; ctx.textAlign='center';
+  mx.forEach(v=>{ if(v!==0 && Math.abs(v-Math.round(v))<1e-9) ctx.fillText(fmt(v,0), X(v), Y(0)+13); });
+  ctx.textAlign='right'; my.forEach(v=>{ if(v!==0 && Math.abs(v-Math.round(v))<1e-9) ctx.fillText(fmt(v,0), X(0)-4, Y(v)+4); });
+  ctx.fillStyle='#0f2244'; ctx.font='italic 600 14px "STIX Two Text", "Times New Roman", serif'; ctx.textAlign='left';
+  ctx.fillText(etU, l+w-10, Y(0)-6); ctx.fillText(etV, X(0)+6, t+12);
+  return {X,Y};
+}
+/* curva implícita F(u,v)=0 por marching squares */
+function contorno(ctx,geo,F,color,ancho,dash,n){
+  n = n || 160; const xs=lin(n,geo.xmin,geo.xmax), ys=lin(n,geo.ymin,geo.ymax); const Z=ys.map(y=>xs.map(x=>F(x,y)));
+  const X=x=>geo.l+(x-geo.xmin)/(geo.xmax-geo.xmin)*geo.w, Y=y=>geo.t+geo.h-(y-geo.ymin)/(geo.ymax-geo.ymin)*geo.h;
+  ctx.save(); ctx.beginPath(); ctx.rect(geo.l,geo.t,geo.w,geo.h); ctx.clip();
+  const segs=[];
+  for(let j=0;j<n-1;j++) for(let i=0;i<n-1;i++){ const v=[Z[j][i],Z[j][i+1],Z[j+1][i+1],Z[j+1][i]]; if(v.some(q=>!isFinite(q))) continue; const p=[[xs[i],ys[j]],[xs[i+1],ys[j]],[xs[i+1],ys[j+1]],[xs[i],ys[j+1]]]; const pts=[];
+    for(let e=0;e<4;e++){ const a=v[e],bq=v[(e+1)%4]; if((a<0)!==(bq<0)){ const u=(0-a)/(bq-a); pts.push([p[e][0]+(p[(e+1)%4][0]-p[e][0])*u, p[e][1]+(p[(e+1)%4][1]-p[e][1])*u]); } }
+    if(pts.length>=2){ segs.push([pts[0],pts[1]]); if(pts.length===4) segs.push([pts[2],pts[3]]); } }
+  /* encadenar los segmentos por extremos comunes, para que el trazo punteado sea continuo */
+  const key=p=>Math.round(X(p[0])*2)+','+Math.round(Y(p[1])*2); const porExtremo=new Map(); segs.forEach((sg,k)=>{ for(const e of [key(sg[0]),key(sg[1])]){ if(!porExtremo.has(e)) porExtremo.set(e,[]); porExtremo.get(e).push(k); } });
+  const usado=new Array(segs.length).fill(false); const cadenas=[];
+  for(let k=0;k<segs.length;k++){ if(usado[k]) continue; usado[k]=true; let cad=[segs[k][0],segs[k][1]];
+    for(const dir of [1,-1]){ let fin=dir===1?cad[cad.length-1]:cad[0]; let sigue=true; while(sigue){ sigue=false; for(const m of (porExtremo.get(key(fin))||[])){ if(usado[m]) continue; const sg=segs[m]; const otro=key(sg[0])===key(fin)?sg[1]:(key(sg[1])===key(fin)?sg[0]:null); if(!otro) continue; usado[m]=true; if(dir===1) cad.push(otro); else cad.unshift(otro); fin=otro; sigue=true; break; } } }
+    cadenas.push(cad); }
+  ctx.strokeStyle=color; ctx.lineWidth=ancho; ctx.setLineDash(dash||[]); ctx.lineCap='round'; ctx.lineJoin='round';
+  for(const cad of cadenas){ ctx.beginPath(); cad.forEach((p,k)=>{ k?ctx.lineTo(X(p[0]),Y(p[1])):ctx.moveTo(X(p[0]),Y(p[1])); }); ctx.stroke(); }
+  ctx.setLineDash([]); ctx.restore();
+}
+function puntoMarcado(ctx,X,Y,x,y,color,lleno){ ctx.beginPath(); ctx.arc(X(x),Y(y),4.2,0,7); ctx.fillStyle=lleno?color:'#fff'; ctx.fill(); ctx.strokeStyle=color; ctx.lineWidth=1.8; ctx.stroke(); }
+/* ---- dominio: región sombreada + fronteras ---- */
+const CANVAS = {};
+function dibujarDominio(cv, sp){
+  const {ctx,w,h} = prepararCanvas(cv, sp.alto||300);
+  const geo = geoIgual(w,h,sp.cx||0,sp.cy||0,sp.half||5);
+  const X=x=>geo.l+(x-geo.xmin)/(geo.xmax-geo.xmin)*geo.w, Y=y=>geo.t+geo.h-(y-geo.ymin)/(geo.ymax-geo.ymin)*geo.h;
+  /* sombreado: un píxel lógico por muestra */
+  const dpr=window.devicePixelRatio||1; const W=Math.round(geo.w*dpr), H=Math.round(geo.h*dpr);
+  const data=ctx.createImageData(W,H);
+  for(let py=0;py<H;py++){ const y=geo.ymax-(geo.ymax-geo.ymin)*(py+0.5)/H; for(let px=0;px<W;px++){ const x=geo.xmin+(geo.xmax-geo.xmin)*(px+0.5)/W; const k=4*(py*W+px); if(sp.dentro(x,y)){ data.data[k]=191;data.data[k+1]=219;data.data[k+2]=254;data.data[k+3]=255; } else { data.data[k]=255;data.data[k+1]=255;data.data[k+2]=255;data.data[k+3]=255; } } }
+  ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.putImageData(data, Math.round(geo.l*dpr), Math.round(geo.t*dpr)); ctx.restore();
+  dibujarEjesXY(ctx, geo, 'x', 'y');
+  (sp.bordes||[]).forEach(b=>{ contorno(ctx,geo,b.F, b.inc?'#0f2244':'#be123c', b.inc?2.4:2.2, b.inc?[]:[6,5]); });
+  (sp.puntos||[]).forEach(p=>puntoMarcado(ctx,X,Y,p[0],p[1],p[2]?'#0f2244':'#be123c',p[2]));
+  if(sp.rotulo){ ctx.fillStyle='#1e3a8a'; ctx.font='600 12px Outfit, sans-serif'; ctx.textAlign='left'; ctx.fillText(sp.rotulo, geo.l+6, geo.t+geo.h-8); }
+}
+/* ---- traza: curva en un plano coordenado ---- */
+function dibujarTraza(cv, sp){
+  const {ctx,w,h} = prepararCanvas(cv, sp.alto||240);
+  const geo = geoIgual(w,h,sp.cx||0,sp.cy||0,sp.half||5);
+  const X=x=>geo.l+(x-geo.xmin)/(geo.xmax-geo.xmin)*geo.w, Y=y=>geo.t+geo.h-(y-geo.ymin)/(geo.ymax-geo.ymin)*geo.h;
+  dibujarEjesXY(ctx, geo, sp.u, sp.v);
+  if(sp.F) contorno(ctx,geo,sp.F,'#1d6fcc',2.6,[],200);
+  (sp.puntos||[]).forEach(p=>puntoMarcado(ctx,X,Y,p[0],p[1],'#1d6fcc',true));
+  if(sp.vacio){ const cx=geo.l+geo.w/2, cy=geo.t+geo.h/2; ctx.font='12px Outfit, sans-serif'; const tw=ctx.measureText('la superficie no corta este plano').width+24; ctx.fillStyle='rgba(255,255,255,.94)'; ctx.strokeStyle='#fecdd3'; ctx.lineWidth=1; ctx.beginPath(); ctx.roundRect(cx-tw/2, cy-26, tw, 50, 8); ctx.fill(); ctx.stroke(); ctx.fillStyle='#be123c'; ctx.font='600 13px Outfit, sans-serif'; ctx.textAlign='center'; ctx.fillText('no hay traza', cx, cy-6); ctx.font='12px Outfit, sans-serif'; ctx.fillText('la superficie no corta este plano', cx, cy+13); }
+}
+function dibujarCanvases(root){ $$('canvas[data-cv]', root).forEach(cv=>{ const sp=CANVAS[cv.dataset.cv]; if(!sp || cv.clientWidth===0) return; if(sp.tipo==='dom') dibujarDominio(cv,sp); else dibujarTraza(cv,sp); }); }
+function cvDom(id, sp){ sp.tipo='dom'; CANVAS[id]=sp; return `<div class="cv-w cv-dom"><canvas class="c2d" data-cv="${id}" role="img" aria-label="gráfico del dominio"></canvas></div>`; }
+function cvTrazas(id, lista){ /* lista: [{t, u, v, F|vacio, half, cx, cy, puntos}] */
+  return `<div class="cv-row">${lista.map((sp,k)=>{ const key=id+'-'+k; CANVAS[key]=Object.assign({tipo:'tra'},sp); return `<div class="cv-w"><div class="ct">${sp.t}</div><canvas class="c2d" data-cv="${key}" role="img" aria-label="traza en el plano ${sp.u}${sp.v}"></canvas></div>`; }).join('')}</div>`;
+}
+
+/* ================= ejercicios ================= */
+const EJ = {};
+const TRAZA_OPS = ['recta','circunferencia','elipse','parábola','hipérbola','un punto','no hay traza'];
+function rotar(e){ if(e.tipo!=='mc' || e._rot!==undefined) return; let h=0; for(const ch of e.id) h=(h*31+ch.charCodeAt(0))%1000003; const n=e.opciones.length, r=h%n; e._rot=r; e.opciones=e.opciones.slice(r).concat(e.opciones.slice(0,r)); e.correcta=(e.correcta-r+n)%n; }
+const sino = (id,j,a,b,dis) => `<span class="sino" data-sino="${id}-${j}"><button type="button" data-v="1" ${dis?'disabled':''}>${a}</button><button type="button" data-v="0" ${dis?'disabled':''}>${b}</button></span>`;
+function ejHTML(e){
+  rotar(e); EJ[e.id]=e; const st=E.ejercicios[e.id]||{ok:false,intentos:0}; let inter=''; const dis=st.ok?'disabled':'';
+  if(e.tipo==='mc') inter=`<div class="opts">${e.opciones.map((o,j)=>`<button class="opt" data-ej="${e.id}" data-j="${j}" ${dis}><span class="k">${'ABCDE'[j]}</span><span>${o}</span></button>`).join('')}</div>`;
+  else if(e.tipo==='num') inter=`<div class="numin">${e.campos.map((c,j)=>`<span class="lb">${c.et}</span><input type="text" inputmode="decimal" id="${e.id}-in${j}" aria-label="${c.nombre}" ${dis}>`).join('')}<button class="btn sm primary" data-chk="${e.id}" ${dis}>Comprobar</button></div>`;
+  else if(e.tipo==='ver') inter=`<div class="ver-grid">
+      <span class="vl">¿La función es solución de la ecuación?</span><span>${sino(e.id,'sol','Sí, es solución','No es solución',st.ok)}</span>
+      <span class="vl">Orden de la ecuación</span><span><input type="text" inputmode="numeric" id="${e.id}-orden" aria-label="orden" ${dis}></span>
+      <span class="vl">Grado de la ecuación</span><span><input type="text" inputmode="numeric" id="${e.id}-grado" aria-label="grado" ${dis}></span>
+      <span class="vl">La función dada, ¿es solución general o particular?</span><span>${sino(e.id,'tipo','General','Particular',st.ok)}</span>
+    </div><div class="tools"><button class="btn sm primary" data-chk="${e.id}" ${dis}>Comprobar</button></div>`;
+  else if(e.tipo==='dom') inter=`<div class="dom-list">${e.items.map((it,j)=>`<div class="dom-it"><span class="dt">${it.t}</span>${sino(e.id,'d'+j,'Pertenece','No pertenece',st.ok)}</div>`).join('')}</div><div class="tools"><button class="btn sm primary" data-chk="${e.id}" ${dis}>Comprobar</button></div>`;
+  else if(e.tipo==='traza'){ const item=(p,j)=>`<div class="tr-it"><span class="tl">${p.t}</span><select id="${e.id}-tr${j}" aria-label="${p.t}" ${dis}><option value="">elegí…</option>${TRAZA_OPS.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`;
+    if(e.grupos) inter=`<div class="tr-cols">${e.grupos.map((g,k)=>`<div class="tr-col"><div class="tr-gt">${g.t}</div><div class="tr-grid uno">${e.planos.map((p,j)=>p.g===k?item(p,j):'').join('')}</div></div>`).join('')}</div>`;
+    else inter=`<div class="tr-grid">${e.planos.map(item).join('')}</div>`;
+    inter+=`<div class="tools"><button class="btn sm primary" data-chk="${e.id}" ${dis}>Comprobar</button></div>`; }
+  const hab=st.ok||st.intentos>0;
+  return `<div class="q" id="card-${e.id}"><div class="qn"><span class="k">${e.et}</span><span class="enq">${e.enunciado}</span>${st.ok?'<span class="badge ok">✔ resuelto</span>':''}</div>${inter}
+    <div class="fb ${st.ok?'ok show':''}" id="${e.id}-fb">${st.ok?e.fbOk:''}</div>
+    <div class="tools">${e.pista?`<button class="btn sm" data-pista="${e.id}">Pista</button>`:''}${e.resol?`<button class="btn sm" data-res="${e.id}" ${hab?'':'disabled title="Primero intentá responder"'}>Ver resolución paso a paso</button>`:''}</div>
+    ${e.pista?`<div class="pista" id="${e.id}-pista"><strong>Pista.</strong> ${e.pista}</div>`:''}
+    ${e.resol?`<div class="resol" id="${e.id}-res">${e.resol}</div>`:''}</div>`;
+}
+const est = id => (E.ejercicios[id] = E.ejercicios[id] || {ok:false,intentos:0});
+function tras(id){ const c=$('card-'+id); const b=c.querySelector(`[data-res="${id}"]`); if(b){ b.disabled=false; b.removeAttribute('title'); } guardar(); renderMath($(id+'-fb')); actualizarProgreso(); }
+function okEj(id){ const c=$('card-'+id); if(!c.querySelector('.badge.ok')) c.querySelector('.qn').insertAdjacentHTML('beforeend','<span class="badge ok">✔ resuelto</span>'); $$('#card-'+id+' input, #card-'+id+' select, #card-'+id+' .sino button, #card-'+id+' [data-chk]').forEach(x=>x.disabled=true); }
+function fallo(id, fb, msg){ const e=EJ[id], st=est(id); fb.className='fb no show'; fb.innerHTML=(msg?msg+' ':'')+(st.intentos>=2&&e.pista?'Abrí la pista o la resolución y volvé a intentar.':'Revisá y volvé a intentar.'); }
+function responderMC(id,j){ const e=EJ[id], st=est(id); if(st.ok) return; st.intentos++; const fb=$(id+'-fb'); const b=$('card-'+id).querySelector(`.opt[data-j="${j}"]`);
+  if(j===e.correcta){ st.ok=true; $$('#card-'+id+' .opt').forEach(x=>x.disabled=true); b.classList.add('right'); fb.className='fb ok show'; fb.innerHTML=e.fbOk; okEj(id); }
+  else { b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'),1400); fallo(id, fb, e.fbNo||''); }
+  tras(id); }
+const leerNum = v => { const s=String(v).trim().replace(',', '.').replace('−','-'); return /^[-+]?(\d+\.?\d*|\.\d+)$/.test(s) ? parseFloat(s) : NaN; };
+const valSino = (id,j) => { const b=$('card-'+id).querySelector(`[data-sino="${id}-${j}"] button.sel`); return b ? +b.dataset.v : null; };
+function responderNum(id){ const e=EJ[id], st=est(id); if(st.ok) return; const fb=$(id+'-fb'); const vals=e.campos.map((c,j)=>leerNum($(`${id}-in${j}`).value));
+  if(vals.some(isNaN)){ fb.className='fb no show'; fb.innerHTML='Completá cada casilla con un solo número (coma o punto decimal, sin fracciones ni cuentas).'; return; }
+  st.intentos++; const malos=e.campos.filter((c,j)=>Math.abs(vals[j]-c.r)>(c.tol??Math.max(1e-6,Math.abs(c.r)*0.01)));
+  e.campos.forEach((c,j)=>$(`${id}-in${j}`).classList.toggle('mal', malos.includes(c)));
+  if(!malos.length){ st.ok=true; fb.className='fb ok show'; fb.innerHTML=e.fbOk; okEj(id); }
+  else fallo(id, fb, e.campos.length>1?`Revisá: ${malos.map(c=>c.nombre).join(', ')}.`:'No coincide.');
+  tras(id); }
+function responderVer(id){ const e=EJ[id], st=est(id); if(st.ok) return; const fb=$(id+'-fb'); const card=$('card-'+id);
+  const sol=valSino(id,'sol'), tipo=valSino(id,'tipo'); const orden=leerNum($(id+'-orden').value), grado=leerNum($(id+'-grado').value);
+  if(sol===null||tipo===null||isNaN(orden)||isNaN(grado)){ fb.className='fb no show'; fb.innerHTML='Completá las cuatro respuestas antes de comprobar.'; return; }
+  st.intentos++; const malos=[];
+  const mk=(sel,mal)=>card.querySelector(sel).classList.toggle('mal',mal);
+  const mSol=(sol===1)!==e.sol; mk(`[data-sino="${id}-sol"]`,mSol); if(mSol) malos.push('si es solución');
+  const mO=orden!==e.orden; mk('#'+id+'-orden',mO); if(mO) malos.push('el orden');
+  const mG=grado!==e.grado; mk('#'+id+'-grado',mG); if(mG) malos.push('el grado');
+  const mT=(tipo===1)!==(e.tipoGen); mk(`[data-sino="${id}-tipo"]`,mT); if(mT) malos.push('general o particular');
+  if(!malos.length){ st.ok=true; fb.className='fb ok show'; fb.innerHTML=e.fbOk; okEj(id); }
+  else fallo(id, fb, `Revisá: ${malos.join(', ')}.`);
+  tras(id); }
+function responderDom(id){ const e=EJ[id], st=est(id); if(st.ok) return; const fb=$(id+'-fb'); const card=$('card-'+id);
+  const vals=e.items.map((it,j)=>valSino(id,'d'+j)); if(vals.some(v=>v===null)){ fb.className='fb no show'; fb.innerHTML='Respondé por cada curva si pertenece o no al dominio.'; return; }
+  st.intentos++; let malos=0; e.items.forEach((it,j)=>{ const mal=(vals[j]===1)!==it.r; card.querySelector(`[data-sino="${id}-d${j}"]`).classList.toggle('mal',mal); if(mal) malos++; });
+  if(!malos){ st.ok=true; fb.className='fb ok show'; fb.innerHTML=e.fbOk; okEj(id); } else fallo(id, fb, malos===1?'Una de las respuestas no es correcta.':`${malos} respuestas no son correctas.`);
+  tras(id); }
+function responderTraza(id){ const e=EJ[id], st=est(id); if(st.ok) return; const fb=$(id+'-fb'); const card=$('card-'+id);
+  const vals=e.planos.map((p,j)=>$(`${id}-tr${j}`).value); if(vals.some(v=>!v)){ fb.className='fb no show'; fb.innerHTML='Elegí la curva de cada traza antes de comprobar.'; return; }
+  st.intentos++; let malos=0; e.planos.forEach((p,j)=>{ const mal=vals[j]!==p.r; $(`${id}-tr${j}`).classList.toggle('mal',mal); if(mal) malos++; });
+  if(!malos){ st.ok=true; fb.className='fb ok show'; fb.innerHTML=e.fbOk; okEj(id); } else fallo(id, fb, malos===1?'Una de las trazas no está bien clasificada.':`${malos} trazas no están bien clasificadas.`);
+  tras(id); }
+document.addEventListener('click', ev=>{ const b=ev.target.closest('button,.acc-h'); if(!b) return;
+  if(b.dataset.ej!==undefined){ responderMC(b.dataset.ej, +b.dataset.j); return; }
+  if(b.dataset.chk){ const e=EJ[b.dataset.chk]; ({num:responderNum, ver:responderVer, dom:responderDom, traza:responderTraza})[e.tipo](b.dataset.chk); return; }
+  if(b.closest('.sino')){ const g=b.closest('.sino'); if(b.disabled) return; $$('button',g).forEach(x=>x.classList.toggle('sel',x===b)); g.classList.remove('mal'); return; }
+  if(b.dataset.pista){ const p=$(b.dataset.pista+'-pista'); p.classList.toggle('show'); b.classList.toggle('on', p.classList.contains('show')); renderMath(p); return; }
+  if(b.dataset.res){ const st=est(b.dataset.res); if(!st.ok && !st.intentos) return; const r=$(b.dataset.res+'-res'); r.classList.toggle('show'); renderMath(r); if(r.classList.contains('show')) dibujarCanvases(r); b.classList.toggle('on', r.classList.contains('show')); return; }
+  if(b.dataset.verej){ const t=b.dataset.verej; irA(t, true); const cont=$('ej-'+t); const accs=$$(':scope > .acc.teo', cont); accs.forEach((a,k)=>{ if(k===0 || t==='tra') a.classList.add('open'); }); dibujarCanvases(cont); setTimeout(()=>{ cont.parentElement.scrollIntoView({behavior:'smooth', block:'start'}); }, 60); return; }
+  if(b.dataset.ir){ irA(b.dataset.ir); return; }
+  if(b.classList.contains('acc-h')){ const acc=b.parentElement; acc.classList.toggle('open'); if(acc.classList.contains('open')) dibujarCanvases(acc); return; } });
+document.addEventListener('keydown', ev=>{ if(ev.key==='Enter' && ev.target.classList && ev.target.classList.contains('acc-h')) ev.target.parentElement.classList.toggle('open'); if(ev.key==='Enter' && ev.target.tagName==='INPUT'){ const b=ev.target.closest('.q')?.querySelector('[data-chk]'); if(b) b.click(); } });
+/* ejemplo resuelto en acordeón, con pasos */
+function pasos(titulo, lista, resultado, abierto){
+  return `<div class="acc teo ${abierto?'open':''}"><div class="acc-h" tabindex="0"><span class="acc-t">${titulo}</span><span class="chev">▼</span></div><div class="acc-b">${lista.map((p,i)=>`<div class="acc step open"><div class="acc-h" tabindex="0"><span class="sn">${i+1}</span><span class="acc-t">${p[0]}</span><span class="chev">▼</span></div><div class="acc-b">${p[1]}</div></div>`).join('')}${resultado?`<div class="box okb" style="margin-top:8px"><span class="bt">Resultado</span>${resultado}</div>`:''}</div></div>`;
+}
+/* resolución de un ejercicio de práctica: pasos numerados sin acordeón */
+const paso = (t, b) => `<div class="paso"><span class="pt"><span class="pn">·</span>${t}</span>${b}</div>`;
+function resolucion(lista, final){ let n=0; return lista.map(p=>{ n++; return `<div class="paso"><span class="pt"><span class="pn">${n}</span>${p[0]}</span>${p[1]}</div>`; }).join('') + (final?`<div class="final"><span class="bt">Respuesta</span>${final}</div>`:''); }
+</script>
+
+<script>
+'use strict';
+/* ================= MAPA · reconocer el método ================= */
+const Q_MAPA = [
+  { id:'m1', tipo:'mc', et:'A', enunciado:R_`Para resolver \(x\,y'+3y=x^3-x^2\), ¿qué método corresponde?`,
+    opciones:['Es lineal de primer orden: forma normal y factor integrante.', 'Es de variables separables: todo lo que tiene \\(y\\) de un lado, todo lo que tiene \\(x\\) del otro.', 'No es lineal ni separable.'], correcta:0,
+    fbOk:R_`Sí. El término \(x^3-x^2\) no se deja separar, pero la ecuación tiene la forma \(y'+P(x)\,y=Q(x)\) después de dividir por \(x\): \(y'+\dfrac{3}{x}\,y=x^2-x\).`,
+    fbNo:R_`Probá separar: \(x\,\dd y=(x^3-x^2-3y)\,\dd x\), y la \(y\) y la \(x\) quedan mezcladas en el paréntesis. En cambio, dividiendo por \(x\) aparece la forma \(y'+P\,y=Q\).` },
+  { id:'m2', tipo:'mc', et:'B', enunciado:R_`Y para \(y'=x\,y^2-x\), ¿qué método corresponde?`,
+    opciones:['Es de variables separables: se saca factor común \\(x\\) y queda \\(\\dfrac{1}{y^2-1}\\,\\dd y=x\\,\\dd x\\).', 'Es lineal de primer orden: \\(P(x)=-x\\) y \\(Q(x)=-x\\).', 'No es lineal ni separable.'], correcta:0,
+    fbOk:R_`Sí. \(y'=x\,(y^2-1)\), y de ahí \(\dfrac{1}{y^2-1}\,\dd y=x\,\dd x\). No es lineal porque aparece \(y^2\): en una lineal, \(y\) y \(y'\) van a la primera potencia.`,
+    fbNo:R_`Fijate en el \(y^2\): una ecuación lineal no puede tener \(y\) elevada al cuadrado. Pero sí se puede sacar \(x\) de factor común y separar.` }
+];
+
+/* ================= LINEALES ================= */
+const EJ_LIN = () => pasos(R_`Ejemplo 1 (el del parcial) · \(x\,y'-2y=x^4-x^2\); solución general y particular por \((1\,;\,3)\)`, [
+  ['Forma normal', R_`Para que el coeficiente de \(y'\) sea 1, dividimos toda la ecuación por \(x\) (con \(x\ne0\)):\[\frac{x\,y'}{x}-\frac{2y}{x}=\frac{x^4}{x}-\frac{x^2}{x}\quad\Longrightarrow\quad y'-\frac{2}{x}\,y=x^3-x\]Ahora se leen \(P(x)=-\dfrac{2}{x}\) y \(Q(x)=x^3-x\).`],
+  ['Factor integrante', R_`Buscamos \(\varphi\) con \(\varphi'=P\,\varphi\), es decir \(\varphi'=-\dfrac{2}{x}\,\varphi\). Es separable: escribimos \(\varphi'=\dfrac{\dd\varphi}{\dd x}\) y pasamos \(\varphi\) dividiendo y \(\dd x\) multiplicando:\[\frac{\dd\varphi}{\dd x}=-\frac{2}{x}\,\varphi\quad\Longrightarrow\quad\frac{1}{\varphi}\,\dd\varphi=-\frac{2}{x}\,\dd x\quad\Longrightarrow\quad\int\frac{1}{\varphi}\,\dd\varphi=-2\int\frac{1}{x}\,\dd x\quad\Longrightarrow\quad\ln\varphi=-2\ln x=\ln x^{-2}\]Entonces \(\varphi=x^{-2}=\dfrac{1}{x^2}\). (Sin constante: alcanza con un factor integrante, cualquiera.)`],
+  ['Multiplicar y reconocer la derivada de un producto', R_`Multiplicamos la forma normal por \(\varphi=\dfrac{1}{x^2}\):\[\frac{1}{x^2}\,y'-\frac{2}{x^3}\,y=\frac{x^3-x}{x^2}=\frac{x^3}{x^2}-\frac{x}{x^2}=x-\frac{1}{x}\]El lado izquierdo es la derivada del producto \(\dfrac{y}{x^2}=x^{-2}y\). Comprobación: \(\left(x^{-2}y\right)'=-2x^{-3}y+x^{-2}y'\), que es exactamente lo que quedó. Entonces\[\left(\frac{y}{x^2}\right)'=x-\frac{1}{x}\]`],
+  ['Integrar', R_`\[\frac{y}{x^2}=\int\left(x-\frac{1}{x}\right)\dd x=\int x\,\dd x-\int\frac{1}{x}\,\dd x=\frac{x^2}{2}-\ln|x|+C\]`],
+  ['Despejar: solución general', R_`Multiplicamos todo por \(x^2\), también la constante:\[y=x^2\left(\frac{x^2}{2}-\ln|x|+C\right)=\frac{x^4}{2}-x^2\ln|x|+C\,x^2\]`],
+  ['Solución particular por \\((1\\,;\\,3)\\)', R_`Reemplazamos \(x=1\), \(y=3\) en la general:\[3=\frac{1^4}{2}-1^2\cdot\ln1+C\cdot1^2=\frac{1}{2}-1\cdot0+C=\frac{1}{2}+C\quad\Longrightarrow\quad C=3-\frac{1}{2}=\frac{5}{2}\]`],
+  ['Verificación', R_`Con \(y=\dfrac{x^4}{2}-x^2\ln x+\dfrac{5}{2}x^2\) (para \(x>0\)): \(y'=2x^3-\left(2x\ln x+x^2\cdot\dfrac{1}{x}\right)+5x=2x^3-2x\ln x-x+5x=2x^3-2x\ln x+4x\). Entonces\[x\,y'-2y=2x^4-2x^2\ln x+4x^2-x^4+2x^2\ln x-5x^2=x^4-x^2\]que es la ecuación original. Y en \(x=1\): \(y=\dfrac{1}{2}-0+\dfrac{5}{2}=3\).`]
+], R_`General: \(y=\dfrac{x^4}{2}-x^2\ln|x|+C\,x^2\). Particular por \((1\,;\,3)\): \(y=\dfrac{x^4}{2}-x^2\ln x+\dfrac{5}{2}x^2\).`, true)
++ pasos(R_`Ejemplo 2 (el del modelo de parcial) · \(x\,y'+3y=x^3-x^2\); solución general y particular por \((1\,;\,0)\)`, [
+  ['Forma normal', R_`Dividimos por \(x\):\[y'+\frac{3}{x}\,y=x^2-x\qquad P(x)=\frac{3}{x},\quad Q(x)=x^2-x\]`],
+  ['Factor integrante', R_`\[\varphi'=\frac{3}{x}\,\varphi\quad\Longrightarrow\quad\frac{1}{\varphi}\,\dd\varphi=\frac{3}{x}\,\dd x\quad\Longrightarrow\quad\ln\varphi=3\ln x=\ln x^3\quad\Longrightarrow\quad\varphi=x^3\]`],
+  ['Multiplicar y reconocer la derivada de un producto', R_`\[x^3\,y'+3x^2\,y=x^3\,(x^2-x)=x^5-x^4\]El lado izquierdo es \((x^3y)'=3x^2y+x^3y'\). Entonces \((x^3y)'=x^5-x^4\).`],
+  ['Integrar', R_`\[x^3y=\int(x^5-x^4)\,\dd x=\frac{x^6}{6}-\frac{x^5}{5}+C\]`],
+  ['Despejar: solución general', R_`Dividimos todo por \(x^3\):\[y=\frac{x^6}{6x^3}-\frac{x^5}{5x^3}+\frac{C}{x^3}=\frac{x^3}{6}-\frac{x^2}{5}+\frac{C}{x^3}\]`],
+  ['Solución particular por \\((1\\,;\\,0)\\)', R_`\[0=\frac{1}{6}-\frac{1}{5}+\frac{C}{1}\quad\Longrightarrow\quad C=\frac{1}{5}-\frac{1}{6}=\frac{6}{30}-\frac{5}{30}=\frac{1}{30}\]`]
+], R_`General: \(y=\dfrac{x^3}{6}-\dfrac{x^2}{5}+\dfrac{C}{x^3}\). Particular: \(y=\dfrac{x^3}{6}-\dfrac{x^2}{5}+\dfrac{1}{30\,x^3}\).`);
+
+const PRAC_LIN = [
+  { id:'l1', tipo:'num', et:'1', enunciado:R_`Hallar la solución general de \(x\,y'+y=2x\) y la particular que pasa por \((1\,;\,3)\). Para comprobar: con la solución particular, calculá \(y(2)\).`,
+    campos:[{et:R_`\(y(2)=\)`, r:3, tol:0.02, nombre:'y(2)'}],
+    pista:R_`Al pasar a la forma normal queda \(P(x)=\dfrac{1}{x}\) y el factor integrante es \(\varphi=x\). Multiplicá por \(x\)… y mirá qué ecuación te queda.`,
+    fbOk:R_`Correcto: \(y=x+\dfrac{2}{x}\), y \(y(2)=2+\dfrac{2}{2}=2+1=3\).`,
+    resol:resolucion([
+      ['Forma normal', R_`Dividimos por \(x\): \(y'+\dfrac{1}{x}\,y=2\). Entonces \(P(x)=\dfrac{1}{x}\) y \(Q(x)=2\).`],
+      ['Factor integrante', R_`\[\varphi'=\frac{1}{x}\,\varphi\ \Longrightarrow\ \frac{\dd\varphi}{\dd x}=\frac{1}{x}\,\varphi\ \Longrightarrow\ \frac{1}{\varphi}\,\dd\varphi=\frac{1}{x}\,\dd x\ \Longrightarrow\ \ln\varphi=\ln x\ \Longrightarrow\ \varphi=x\]`],
+      ['Multiplicar y reconocer la derivada de un producto', R_`Multiplicando la forma normal por \(x\) volvemos a la ecuación original: \(x\,y'+y=2x\). Y el lado izquierdo es justamente \((x\,y)'=1\cdot y+x\,y'\). La ecuación ya venía multiplicada por su factor integrante:\[(x\,y)'=2x\]`],
+      ['Integrar', R_`\[x\,y=\int2x\,\dd x=x^2+C\]`],
+      ['Despejar: solución general', R_`\[y=\frac{x^2}{x}+\frac{C}{x}=x+\frac{C}{x}\]`],
+      ['Solución particular por \\((1\\,;\\,3)\\)', R_`\[3=1+\frac{C}{1}\ \Longrightarrow\ C=3-1=2\qquad y=x+\frac{2}{x}\]`],
+      ['El valor pedido', R_`\[y(2)=2+\frac{2}{2}=2+1=3\]`]
+    ], R_`General \(y=x+\dfrac{C}{x}\); particular \(y=x+\dfrac{2}{x}\); \(y(2)=3\).`) },
+  { id:'l2', tipo:'num', et:'2', enunciado:R_`Hallar la solución general de \(x\,y'+2y=5x^3\) y la particular que pasa por \((1\,;\,3)\). Para comprobar: con la solución particular, calculá \(y(2)\).`,
+    campos:[{et:R_`\(y(2)=\)`, r:8.5, tol:0.02, nombre:'y(2)'}],
+    pista:R_`Forma normal: \(y'+\dfrac{2}{x}\,y=5x^2\). Con \(P=\dfrac{2}{x}\) el factor integrante es \(x^2\), y \((x^2y)'=5x^4\).`,
+    fbOk:R_`Correcto: \(y=x^3+\dfrac{2}{x^2}\), y \(y(2)=8+\dfrac{2}{4}=8+0{,}5=8{,}5\).`,
+    resol:resolucion([
+      ['Forma normal', R_`Dividimos por \(x\): \(y'+\dfrac{2}{x}\,y=5x^2\). Entonces \(P(x)=\dfrac{2}{x}\), \(Q(x)=5x^2\).`],
+      ['Factor integrante', R_`\[\varphi'=\frac{2}{x}\,\varphi\ \Longrightarrow\ \frac{\dd\varphi}{\dd x}=\frac{2}{x}\,\varphi\ \Longrightarrow\ \frac{1}{\varphi}\,\dd\varphi=\frac{2}{x}\,\dd x\ \Longrightarrow\ \ln\varphi=2\ln x=\ln x^2\ \Longrightarrow\ \varphi=x^2\]`],
+      ['Multiplicar y reconocer la derivada de un producto', R_`\[x^2\,y'+2x\,y=5x^2\cdot x^2=5x^4\]El lado izquierdo es \((x^2y)'=2x\,y+x^2\,y'\). Entonces \((x^2y)'=5x^4\).`],
+      ['Integrar', R_`\[x^2y=\int5x^4\,\dd x=5\cdot\frac{x^5}{5}+C=x^5+C\]`],
+      ['Despejar: solución general', R_`\[y=\frac{x^5}{x^2}+\frac{C}{x^2}=x^3+\frac{C}{x^2}\]`],
+      ['Solución particular por \\((1\\,;\\,3)\\)', R_`\[3=1^3+\frac{C}{1^2}=1+C\ \Longrightarrow\ C=2\qquad y=x^3+\frac{2}{x^2}\]`],
+      ['El valor pedido', R_`\[y(2)=2^3+\frac{2}{2^2}=8+\frac{2}{4}=8+0{,}5=8{,}5\]`]
+    ], R_`General \(y=x^3+\dfrac{C}{x^2}\); particular \(y=x^3+\dfrac{2}{x^2}\); \(y(2)=8{,}5\).`) },
+  { id:'l3', tipo:'num', et:'3', enunciado:R_`Hallar la solución general de \(y'-\dfrac{y}{x}=x^2\) y la particular que pasa por \((2\,;\,2)\). Para comprobar: con la solución particular, calculá \(y(1)\).`,
+    campos:[{et:R_`\(y(1)=\)`, r:-0.5, tol:0.02, nombre:'y(1)'}],
+    pista:R_`Ya está en forma normal, con \(P(x)=-\dfrac{1}{x}\). El factor integrante es \(\ee^{-\ln x}=x^{-1}=\dfrac{1}{x}\), y \(\left(\dfrac{y}{x}\right)'=x\).`,
+    fbOk:R_`Correcto: \(y=\dfrac{x^3}{2}-x\), y \(y(1)=\dfrac{1}{2}-1=-\dfrac{1}{2}=-0{,}5\).`,
+    resol:resolucion([
+      ['Forma normal', R_`La ecuación ya tiene coeficiente 1 en \(y'\): \(y'-\dfrac{1}{x}\,y=x^2\). Entonces \(P(x)=-\dfrac{1}{x}\), \(Q(x)=x^2\).`],
+      ['Factor integrante', R_`\[\varphi'=-\frac{1}{x}\,\varphi\ \Longrightarrow\ \frac{\dd\varphi}{\dd x}=-\frac{1}{x}\,\varphi\ \Longrightarrow\ \frac{1}{\varphi}\,\dd\varphi=-\frac{1}{x}\,\dd x\ \Longrightarrow\ \ln\varphi=-\ln x=\ln x^{-1}\ \Longrightarrow\ \varphi=x^{-1}=\frac{1}{x}\]`],
+      ['Multiplicar y reconocer la derivada de un producto', R_`\[\frac{1}{x}\,y'-\frac{1}{x^2}\,y=\frac{x^2}{x}=x\]El lado izquierdo es \(\left(\dfrac{y}{x}\right)'=\left(x^{-1}y\right)'=-x^{-2}y+x^{-1}y'\). Entonces \(\left(\dfrac{y}{x}\right)'=x\).`],
+      ['Integrar', R_`\[\frac{y}{x}=\int x\,\dd x=\frac{x^2}{2}+C\]`],
+      ['Despejar: solución general', R_`\[y=x\left(\frac{x^2}{2}+C\right)=\frac{x^3}{2}+C\,x\]`],
+      ['Solución particular por \\((2\\,;\\,2)\\)', R_`\[2=\frac{2^3}{2}+C\cdot2=\frac{8}{2}+2C=4+2C\ \Longrightarrow\ 2C=2-4=-2\ \Longrightarrow\ C=-1\qquad y=\frac{x^3}{2}-x\]`],
+      ['El valor pedido', R_`\[y(1)=\frac{1^3}{2}-1=\frac{1}{2}-1=-\frac{1}{2}=-0{,}5\]`]
+    ], R_`General \(y=\dfrac{x^3}{2}+C\,x\); particular \(y=\dfrac{x^3}{2}-x\); \(y(1)=-0{,}5\).`) },
+  { id:'l4', tipo:'num', et:'4', enunciado:R_`Hallar la solución general de \(y'+3y=\ee^{-x}\) y la particular con \(y(0)=1\). Para comprobar: con la solución particular, calculá \(y(1)\) (con tres decimales).`,
+    campos:[{et:R_`\(y(1)=\)`, r:0.208833, tol:0.004, nombre:'y(1)'}],
+    pista:R_`Acá \(P(x)=3\) es constante: \(\varphi=\ee^{3x}\). Al multiplicar, \(\ee^{3x}\cdot\ee^{-x}=\ee^{2x}\).`,
+    fbOk:R_`Correcto: \(y=\dfrac{\ee^{-x}+\ee^{-3x}}{2}\), y \(y(1)=\dfrac{\ee^{-1}+\ee^{-3}}{2}\approx\dfrac{0{,}3679+0{,}0498}{2}\approx0{,}209\).`,
+    resol:resolucion([
+      ['Forma normal', R_`Ya está: \(y'+3y=\ee^{-x}\), con \(P(x)=3\) y \(Q(x)=\ee^{-x}\).`],
+      ['Factor integrante', R_`\[\varphi'=3\varphi\ \Longrightarrow\ \frac{\dd\varphi}{\dd x}=3\varphi\ \Longrightarrow\ \frac{1}{\varphi}\,\dd\varphi=3\,\dd x\ \Longrightarrow\ \ln\varphi=3x\ \Longrightarrow\ \varphi=\ee^{3x}\]`],
+      ['Multiplicar y reconocer la derivada de un producto', R_`\[\ee^{3x}\,y'+3\ee^{3x}\,y=\ee^{3x}\cdot\ee^{-x}=\ee^{3x-x}=\ee^{2x}\]El lado izquierdo es \(\left(\ee^{3x}y\right)'=3\ee^{3x}y+\ee^{3x}y'\). Entonces \(\left(\ee^{3x}y\right)'=\ee^{2x}\).`],
+      ['Integrar', R_`\[\ee^{3x}y=\int\ee^{2x}\,\dd x=\frac{\ee^{2x}}{2}+C\]`],
+      ['Despejar: solución general', R_`Dividimos por \(\ee^{3x}\), o sea multiplicamos por \(\ee^{-3x}\):\[y=\frac{\ee^{2x}}{2}\,\ee^{-3x}+C\,\ee^{-3x}=\frac{\ee^{-x}}{2}+C\,\ee^{-3x}\]`],
+      ['Solución particular con \\(y(0)=1\\)', R_`\[1=\frac{\ee^{0}}{2}+C\,\ee^{0}=\frac{1}{2}+C\ \Longrightarrow\ C=\frac{1}{2}\qquad y=\frac{\ee^{-x}}{2}+\frac{\ee^{-3x}}{2}=\frac{\ee^{-x}+\ee^{-3x}}{2}\]`],
+      ['El valor pedido', R_`\[y(1)=\frac{\ee^{-1}+\ee^{-3}}{2}\approx\frac{0{,}3679+0{,}0498}{2}=\frac{0{,}4177}{2}\approx0{,}2088\]`]
+    ], R_`General \(y=\dfrac{\ee^{-x}}{2}+C\,\ee^{-3x}\); particular \(y=\dfrac{\ee^{-x}+\ee^{-3x}}{2}\); \(y(1)\approx0{,}209\).`) },
+  { id:'l5', tipo:'num', et:'5', enunciado:R_`Hallar la solución general de \(x\,y'-3y=x^5+x^3\) y la particular que pasa por \((1\,;\,2)\). Para comprobar: con la solución particular, calculá \(y(2)\) (con dos decimales).`,
+    campos:[{et:R_`\(y(2)=\)`, r:33.5452, tol:0.1, nombre:'y(2)'}],
+    pista:R_`Forma normal: \(y'-\dfrac{3}{x}\,y=x^4+x^2\). El factor integrante es \(x^{-3}\), y al multiplicar aparece \(\dfrac{1}{x}\) en el lado derecho: su integral es un logaritmo, como en el parcial.`,
+    fbOk:R_`Correcto: \(y=\dfrac{x^5}{2}+x^3\ln x+\dfrac{3}{2}x^3\), y \(y(2)=16+8\ln2+12\approx16+5{,}545+12\approx33{,}55\).`,
+    resol:resolucion([
+      ['Forma normal', R_`Dividimos por \(x\): \(y'-\dfrac{3}{x}\,y=x^4+x^2\). Entonces \(P(x)=-\dfrac{3}{x}\), \(Q(x)=x^4+x^2\).`],
+      ['Factor integrante', R_`\[\varphi'=-\frac{3}{x}\,\varphi\ \Longrightarrow\ \frac{\dd\varphi}{\dd x}=-\frac{3}{x}\,\varphi\ \Longrightarrow\ \frac{1}{\varphi}\,\dd\varphi=-\frac{3}{x}\,\dd x\ \Longrightarrow\ \ln\varphi=-3\ln x=\ln x^{-3}\ \Longrightarrow\ \varphi=x^{-3}=\frac{1}{x^3}\]`],
+      ['Multiplicar y reconocer la derivada de un producto', R_`\[\frac{1}{x^3}\,y'-\frac{3}{x^4}\,y=\frac{x^4+x^2}{x^3}=\frac{x^4}{x^3}+\frac{x^2}{x^3}=x+\frac{1}{x}\]El lado izquierdo es \(\left(x^{-3}y\right)'=-3x^{-4}y+x^{-3}y'\). Entonces \(\left(\dfrac{y}{x^3}\right)'=x+\dfrac{1}{x}\).`],
+      ['Integrar', R_`\[\frac{y}{x^3}=\int\left(x+\frac{1}{x}\right)\dd x=\frac{x^2}{2}+\ln|x|+C\]`],
+      ['Despejar: solución general', R_`\[y=x^3\left(\frac{x^2}{2}+\ln|x|+C\right)=\frac{x^5}{2}+x^3\ln|x|+C\,x^3\]`],
+      ['Solución particular por \\((1\\,;\\,2)\\)', R_`\[2=\frac{1}{2}+1\cdot\ln1+C\cdot1=\frac{1}{2}+0+C\ \Longrightarrow\ C=2-\frac{1}{2}=\frac{3}{2}\qquad y=\frac{x^5}{2}+x^3\ln x+\frac{3}{2}x^3\]`],
+      ['El valor pedido', R_`\[y(2)=\frac{2^5}{2}+2^3\ln2+\frac{3}{2}\cdot2^3=\frac{32}{2}+8\ln2+\frac{24}{2}=16+8\cdot0{,}6931+12\approx16+5{,}545+12=33{,}545\]`]
+    ], R_`General \(y=\dfrac{x^5}{2}+x^3\ln|x|+C\,x^3\); particular \(y=\dfrac{x^5}{2}+x^3\ln x+\dfrac{3}{2}x^3\); \(y(2)\approx33{,}55\).`) },
+  { id:'l6', tipo:'num', et:'6', enunciado:R_`Hallar la solución general de \(x\,y'+3y=x^2-2x\) y la particular que pasa por \((1\,;\,0)\). Para comprobar: con la solución particular, calculá \(y(2)\) (con cuatro decimales).`,
+    campos:[{et:R_`\(y(2)=\)`, r:-0.1625, tol:0.003, nombre:'y(2)'}],
+    pista:R_`Forma normal: \(y'+\dfrac{3}{x}\,y=x-2\); factor integrante \(x^3\); \((x^3y)'=x^4-2x^3\). La constante va a dar una fracción: no pasa nada.`,
+    fbOk:R_`Correcto: \(y=\dfrac{x^2}{5}-\dfrac{x}{2}+\dfrac{3}{10\,x^3}\), y \(y(2)=\dfrac{4}{5}-1+\dfrac{3}{80}=0{,}8-1+0{,}0375=-0{,}1625\).`,
+    resol:resolucion([
+      ['Forma normal', R_`Dividimos por \(x\): \(y'+\dfrac{3}{x}\,y=x-2\). Entonces \(P(x)=\dfrac{3}{x}\), \(Q(x)=x-2\).`],
+      ['Factor integrante', R_`\[\varphi'=\frac{3}{x}\,\varphi\ \Longrightarrow\ \ln\varphi=3\ln x=\ln x^3\ \Longrightarrow\ \varphi=x^3\]`],
+      ['Multiplicar y reconocer la derivada de un producto', R_`\[x^3\,y'+3x^2\,y=x^3\,(x-2)=x^4-2x^3\]El lado izquierdo es \((x^3y)'=3x^2y+x^3y'\). Entonces \((x^3y)'=x^4-2x^3\).`],
+      ['Integrar', R_`\[x^3y=\int(x^4-2x^3)\,\dd x=\frac{x^5}{5}-2\cdot\frac{x^4}{4}+C=\frac{x^5}{5}-\frac{x^4}{2}+C\]`],
+      ['Despejar: solución general', R_`\[y=\frac{x^5}{5x^3}-\frac{x^4}{2x^3}+\frac{C}{x^3}=\frac{x^2}{5}-\frac{x}{2}+\frac{C}{x^3}\]`],
+      ['Solución particular por \\((1\\,;\\,0)\\)', R_`\[0=\frac{1}{5}-\frac{1}{2}+C\ \Longrightarrow\ C=\frac{1}{2}-\frac{1}{5}=\frac{5}{10}-\frac{2}{10}=\frac{3}{10}\qquad y=\frac{x^2}{5}-\frac{x}{2}+\frac{3}{10\,x^3}\]`],
+      ['El valor pedido', R_`\[y(2)=\frac{2^2}{5}-\frac{2}{2}+\frac{3}{10\cdot2^3}=\frac{4}{5}-1+\frac{3}{80}=0{,}8-1+0{,}0375=-0{,}1625\]`]
+    ], R_`General \(y=\dfrac{x^2}{5}-\dfrac{x}{2}+\dfrac{C}{x^3}\); particular \(y=\dfrac{x^2}{5}-\dfrac{x}{2}+\dfrac{3}{10\,x^3}\); \(y(2)=-0{,}1625\).`) }
+];
+
+/* ================= SEPARABLES ================= */
+const EJ_SEP = () => pasos(R_`Ejemplo 1 · \((x+1)\,\dd y-y\,\dd x=0\)`, [
+  ['Separar', R_`Pasamos el término con \(\dd x\) al otro lado y dividimos por \(y\) y por \((x+1)\), con \(y\ne0\) y \(x\ne-1\):\[(x+1)\,\dd y=y\,\dd x\quad\Longrightarrow\quad\frac{1}{y}\,\dd y=\frac{1}{x+1}\,\dd x\]`],
+  ['Integrar', R_`\[\int\frac{1}{y}\,\dd y=\int\frac{1}{x+1}\,\dd x\quad\Longrightarrow\quad\ln|y|=\ln|x+1|+C\]`],
+  ['Despejar', R_`Aplicamos la exponencial a los dos lados:\[|y|=\ee^{\ln|x+1|+C}=\ee^{\ln|x+1|}\cdot\ee^{C}=\ee^{C}\,|x+1|\]Llamando \(K=\pm\ee^{C}\) (cualquier constante distinta de cero; y \(K=0\) recupera la solución \(y=0\) que habíamos apartado): \(y=K\,(x+1)\).`]
+], R_`\(y=K\,(x+1)\): todas las rectas que pasan por \((-1\,;\,0)\).`, true)
++ pasos(R_`Ejemplo 2 (del TP) · \(y'=x\,y^2-x\) con \(y(0)=2\)`, [
+  ['Separar', R_`Sacamos factor común: \(y'=x\,(y^2-1)\). Con \(y^2\ne1\):\[\frac{1}{y^2-1}\,\dd y=x\,\dd x\]`],
+  ['Integrar el lado de \\(y\\): fracciones simples', R_`Como \(y^2-1=(y-1)(y+1)\), buscamos \(\dfrac{1}{(y-1)(y+1)}=\dfrac{A}{y-1}+\dfrac{B}{y+1}\). Multiplicando por \((y-1)(y+1)\): \(1=A\,(y+1)+B\,(y-1)\). Con \(y=1\): \(1=2A\), \(A=\dfrac{1}{2}\). Con \(y=-1\): \(1=-2B\), \(B=-\dfrac{1}{2}\). Entonces\[\int\frac{1}{y^2-1}\,\dd y=\frac{1}{2}\int\frac{1}{y-1}\,\dd y-\frac{1}{2}\int\frac{1}{y+1}\,\dd y=\frac{1}{2}\ln|y-1|-\frac{1}{2}\ln|y+1|=\frac{1}{2}\ln\left|\frac{y-1}{y+1}\right|\]`],
+  ['Integrar el lado de \\(x\\) e igualar', R_`\[\frac{1}{2}\ln\left|\frac{y-1}{y+1}\right|=\frac{x^2}{2}+C\quad\Longrightarrow\quad\ln\left|\frac{y-1}{y+1}\right|=x^2+2C\]Aplicando la exponencial y llamando \(K=\pm\ee^{2C}\): \(\dfrac{y-1}{y+1}=K\,\ee^{x^2}\).`],
+  ['Condición inicial', R_`Con \(x=0\), \(y=2\): \(\dfrac{2-1}{2+1}=K\,\ee^{0}\), o sea \(\dfrac{1}{3}=K\). Queda \(\dfrac{y-1}{y+1}=\dfrac{\ee^{x^2}}{3}\).`],
+  ['Despejar \\(y\\)', R_`\[3\,(y-1)=\ee^{x^2}(y+1)\ \Longrightarrow\ 3y-3=\ee^{x^2}y+\ee^{x^2}\ \Longrightarrow\ 3y-\ee^{x^2}y=3+\ee^{x^2}\ \Longrightarrow\ y\,(3-\ee^{x^2})=3+\ee^{x^2}\]\[y=\frac{3+\ee^{x^2}}{3-\ee^{x^2}}\]Control: en \(x=0\), \(y=\dfrac{3+1}{3-1}=\dfrac{4}{2}=2\).`]
+], R_`\(y=\dfrac{\ee^{x^2}+3}{3-\ee^{x^2}}\), que es la respuesta del TP.`);
+
+const PRAC_SEP = [
+  { id:'s1', tipo:'num', et:'1', enunciado:R_`Resolver \(y'=x\,y\) con \(y(0)=3\). Para comprobar: calculá \(y(1)\) (con tres decimales).`,
+    campos:[{et:R_`\(y(1)=\)`, r:4.94616, tol:0.02, nombre:'y(1)'}],
+    pista:R_`\(\dfrac{1}{y}\,\dd y=x\,\dd x\). Al integrar aparece \(\ln|y|\); la exponencial convierte la constante en un factor \(K\).`,
+    fbOk:R_`Correcto: \(y=3\,\ee^{\frac{x^2}{2}}\), y \(y(1)=3\,\ee^{0{,}5}\approx3\cdot1{,}6487\approx4{,}946\).`,
+    resol:resolucion([
+      ['Separar', R_`\[\frac{\dd y}{\dd x}=x\,y\ \Longrightarrow\ \frac{1}{y}\,\dd y=x\,\dd x\qquad(y\ne0)\]`],
+      ['Integrar', R_`\[\int\frac{1}{y}\,\dd y=\int x\,\dd x\ \Longrightarrow\ \ln|y|=\frac{x^2}{2}+C\]`],
+      ['Despejar', R_`\[|y|=\ee^{\frac{x^2}{2}+C}=\ee^{C}\,\ee^{\frac{x^2}{2}}\ \Longrightarrow\ y=K\,\ee^{\frac{x^2}{2}}\quad(K=\pm\ee^{C})\]`],
+      ['Condición inicial', R_`\(y(0)=3\): \(3=K\,\ee^{0}=K\). Entonces \(y=3\,\ee^{\frac{x^2}{2}}\).`],
+      ['El valor pedido', R_`\[y(1)=3\,\ee^{\frac{1}{2}}\approx3\cdot1{,}6487=4{,}946\]`]
+    ], R_`\(y=3\,\ee^{\frac{x^2}{2}}\); \(y(1)\approx4{,}946\).`) },
+  { id:'s2', tipo:'num', et:'2', enunciado:R_`Resolver \(2y\,\dd y-\cos x\,\dd x=0\) con \(y(0)=1\). Para comprobar: calculá \(y\!\left(\dfrac{\pi}{2}\right)\) (con tres decimales).`,
+    campos:[{et:R_`\(y\!\left(\frac{\pi}{2}\right)=\)`, r:1.41421, tol:0.01, nombre:'y(π/2)'}],
+    pista:R_`Ya está separada: \(2y\,\dd y=\cos x\,\dd x\). La solución queda implícita, \(y^2=\ldots\); para despejar elegí el signo de la raíz con la condición inicial.`,
+    fbOk:R_`Correcto: \(y^2=\sen x+1\), \(y=\sqrt{\sen x+1}\), y \(y\!\left(\dfrac{\pi}{2}\right)=\sqrt{1+1}=\sqrt{2}\approx1{,}414\).`,
+    resol:resolucion([
+      ['Separar', R_`\[2y\,\dd y=\cos x\,\dd x\]`],
+      ['Integrar', R_`\[\int2y\,\dd y=\int\cos x\,\dd x\ \Longrightarrow\ y^2=\sen x+C\]`],
+      ['Condición inicial', R_`\(y(0)=1\): \(1^2=\sen0+C=0+C\), así que \(C=1\) y \(y^2=\sen x+1\).`],
+      ['Despejar', R_`\(y=\pm\sqrt{\sen x+1}\). Como \(y(0)=1>0\), es la raíz positiva: \(y=\sqrt{\sen x+1}\).`],
+      ['El valor pedido', R_`\[y\!\left(\frac{\pi}{2}\right)=\sqrt{\sen\frac{\pi}{2}+1}=\sqrt{1+1}=\sqrt{2}\approx1{,}414\]`]
+    ], R_`\(y=\sqrt{\sen x+1}\); \(y\!\left(\dfrac{\pi}{2}\right)=\sqrt{2}\approx1{,}414\).`) },
+  { id:'s3', tipo:'num', et:'3', enunciado:R_`Resolver \(y'=\dfrac{1+y^2}{1+x^2}\) con \(y(0)=1\). Para comprobar: calculá \(y\!\left(\dfrac{1}{2}\right)\).`,
+    campos:[{et:R_`\(y\!\left(\frac{1}{2}\right)=\)`, r:3, tol:0.02, nombre:'y(1/2)'}],
+    pista:R_`\(\dfrac{1}{1+y^2}\,\dd y=\dfrac{1}{1+x^2}\,\dd x\): las dos integrales son arcotangentes. La constante sale de \(\arctg1=\dfrac{\pi}{4}\).`,
+    fbOk:R_`Correcto: \(\arctg y=\arctg x+\dfrac{\pi}{4}\), y \(y\!\left(\dfrac{1}{2}\right)=\tg\!\left(\arctg\dfrac{1}{2}+\dfrac{\pi}{4}\right)=3\).`,
+    resol:resolucion([
+      ['Separar', R_`\[\frac{\dd y}{\dd x}=\frac{1+y^2}{1+x^2}\ \Longrightarrow\ \frac{1}{1+y^2}\,\dd y=\frac{1}{1+x^2}\,\dd x\]`],
+      ['Integrar', R_`\[\int\frac{1}{1+y^2}\,\dd y=\int\frac{1}{1+x^2}\,\dd x\ \Longrightarrow\ \arctg y=\arctg x+C\]`],
+      ['Condición inicial', R_`\(y(0)=1\): \(\arctg1=\arctg0+C\), o sea \(\dfrac{\pi}{4}=0+C\). Entonces \(\arctg y=\arctg x+\dfrac{\pi}{4}\).`],
+      ['Despejar', R_`\(y=\tg\!\left(\arctg x+\dfrac{\pi}{4}\right)\). Con la fórmula \(\tg(a+b)=\dfrac{\tg a+\tg b}{1-\tg a\,\tg b}\), \(\tg(\arctg x)=x\) y \(\tg\dfrac{\pi}{4}=1\):\[y=\frac{x+1}{1-x\cdot1}=\frac{x+1}{1-x}\]Control: \(y(0)=\dfrac{0+1}{1-0}=1\).`],
+      ['El valor pedido', R_`\[y\!\left(\frac{1}{2}\right)=\frac{\frac{1}{2}+1}{1-\frac{1}{2}}=\frac{\frac{3}{2}}{\frac{1}{2}}=3\]También con la calculadora: \(\tg\!\left(\arctg0{,}5+0{,}7854\right)=\tg(0{,}4636+0{,}7854)=\tg(1{,}2490)\approx3{,}00\).`]
+    ], R_`\(y=\dfrac{x+1}{1-x}\) (equivalente a \(\arctg y=\arctg x+\dfrac{\pi}{4}\)); \(y\!\left(\dfrac{1}{2}\right)=3\).`) },
+  { id:'s4', tipo:'num', et:'4', enunciado:R_`Resolver \(y'=\ee^{\,x-y}\) con \(y(0)=\ln2\). Para comprobar: calculá \(y(1)\) (con tres decimales).`,
+    campos:[{et:R_`\(y(1)=\)`, r:1.31326, tol:0.01, nombre:'y(1)'}],
+    pista:R_`\(\ee^{\,x-y}=\ee^{x}\cdot\ee^{-y}\). Pasá el \(\ee^{-y}\) al lado de \(\dd y\): queda \(\ee^{y}\,\dd y=\ee^{x}\,\dd x\).`,
+    fbOk:R_`Correcto: \(\ee^{y}=\ee^{x}+1\), \(y=\ln(\ee^{x}+1)\), y \(y(1)=\ln(\ee+1)\approx\ln3{,}7183\approx1{,}313\).`,
+    resol:resolucion([
+      ['Separar', R_`\[\frac{\dd y}{\dd x}=\ee^{x}\,\ee^{-y}\ \Longrightarrow\ \frac{1}{\ee^{-y}}\,\dd y=\ee^{x}\,\dd x\ \Longrightarrow\ \ee^{y}\,\dd y=\ee^{x}\,\dd x\]`],
+      ['Integrar', R_`\[\int\ee^{y}\,\dd y=\int\ee^{x}\,\dd x\ \Longrightarrow\ \ee^{y}=\ee^{x}+C\]`],
+      ['Condición inicial', R_`\(y(0)=\ln2\): \(\ee^{\ln2}=\ee^{0}+C\), o sea \(2=1+C\), \(C=1\). Entonces \(\ee^{y}=\ee^{x}+1\).`],
+      ['Despejar', R_`Aplicamos logaritmo: \(y=\ln(\ee^{x}+1)\). Control: \(y(0)=\ln(1+1)=\ln2\).`],
+      ['El valor pedido', R_`\[y(1)=\ln(\ee+1)=\ln(2{,}7183+1)=\ln3{,}7183\approx1{,}313\]`]
+    ], R_`\(y=\ln(\ee^{x}+1)\); \(y(1)\approx1{,}313\).`) },
+  { id:'s5', tipo:'num', et:'5', enunciado:R_`Resolver \(x\,y'=y^2+1\) con \(y(1)=0\). Para comprobar: calculá \(y(\ee)\) (con tres decimales).`,
+    campos:[{et:R_`\(y(\ee)=\)`, r:1.55741, tol:0.01, nombre:'y(e)'}],
+    pista:R_`\(\dfrac{1}{y^2+1}\,\dd y=\dfrac{1}{x}\,\dd x\): arcotangente de un lado, logaritmo del otro. La condición da \(C=0\).`,
+    fbOk:R_`Correcto: \(\arctg y=\ln x\), \(y=\tg(\ln x)\), y \(y(\ee)=\tg(\ln\ee)=\tg1\approx1{,}557\).`,
+    resol:resolucion([
+      ['Separar', R_`\[x\,\frac{\dd y}{\dd x}=y^2+1\ \Longrightarrow\ \frac{1}{y^2+1}\,\dd y=\frac{1}{x}\,\dd x\qquad(x\ne0)\]`],
+      ['Integrar', R_`\[\int\frac{1}{y^2+1}\,\dd y=\int\frac{1}{x}\,\dd x\ \Longrightarrow\ \arctg y=\ln|x|+C\]`],
+      ['Condición inicial', R_`\(y(1)=0\): \(\arctg0=\ln1+C\), o sea \(0=0+C\), \(C=0\). Entonces \(\arctg y=\ln x\) (con \(x>0\), porque la condición está en \(x=1\)).`],
+      ['Despejar', R_`\(y=\tg(\ln x)\).`],
+      ['El valor pedido', R_`\[y(\ee)=\tg(\ln\ee)=\tg1\approx1{,}557\quad\text{(1 radián, no 1 grado)}\]`]
+    ], R_`\(y=\tg(\ln x)\); \(y(\ee)=\tg1\approx1{,}557\).`) },
+  { id:'s6', tipo:'num', et:'6', enunciado:R_`Resolver \(y'=\dfrac{x\,y}{x^2+1}\) con \(y(0)=2\). Para comprobar: calculá \(y(2)\) (con tres decimales).`,
+    campos:[{et:R_`\(y(2)=\)`, r:4.47214, tol:0.02, nombre:'y(2)'}],
+    pista:R_`\(\dfrac{1}{y}\,\dd y=\dfrac{x\,\dd x}{x^2+1}\). Para la integral de la derecha, sustituí \(u=x^2+1\), \(\dd u=2x\,\dd x\): sale \(\dfrac{1}{2}\ln(x^2+1)\).`,
+    fbOk:R_`Correcto: \(y=2\sqrt{x^2+1}\), y \(y(2)=2\sqrt{5}\approx2\cdot2{,}2361\approx4{,}472\).`,
+    resol:resolucion([
+      ['Separar', R_`\[\frac{\dd y}{\dd x}=\frac{x\,y}{x^2+1}\ \Longrightarrow\ \frac{1}{y}\,\dd y=\frac{x}{x^2+1}\,\dd x\qquad(y\ne0)\]`],
+      ['Integrar', R_`Lado izquierdo: \(\ln|y|\). Lado derecho, con \(u=x^2+1\), \(\dd u=2x\,\dd x\), o sea \(x\,\dd x=\dfrac{1}{2}\,\dd u\):\[\int\frac{x}{x^2+1}\,\dd x=\int\frac{1}{u}\cdot\frac{1}{2}\,\dd u=\frac{1}{2}\ln|u|=\frac{1}{2}\ln(x^2+1)\]Entonces \(\ln|y|=\dfrac{1}{2}\ln(x^2+1)+C\).`],
+      ['Despejar', R_`\[|y|=\ee^{\frac{1}{2}\ln(x^2+1)+C}=\ee^{C}\cdot\ee^{\ln(x^2+1)^{\frac{1}{2}}}=\ee^{C}\sqrt{x^2+1}\ \Longrightarrow\ y=K\sqrt{x^2+1}\]`],
+      ['Condición inicial', R_`\(y(0)=2\): \(2=K\sqrt{0+1}=K\). Entonces \(y=2\sqrt{x^2+1}\).`],
+      ['El valor pedido', R_`\[y(2)=2\sqrt{2^2+1}=2\sqrt{5}\approx2\cdot2{,}2361=4{,}472\]`]
+    ], R_`\(y=2\sqrt{x^2+1}\); \(y(2)=2\sqrt{5}\approx4{,}472\).`) }
+];
+</script>
+
+<script>
+'use strict';
+/* ================= VERIFICAR, ORDEN Y GRADO ================= */
+const EJ_VER = () => pasos(R_`Ejemplo 1 (el del parcial) · ¿\(y=-\dfrac{x^2}{2}\) es solución de \(y''-4y'=0\)? Orden, grado, ¿general o particular?`, [
+  ['Las derivadas que pide la ecuación', R_`La ecuación usa \(y'\) e \(y''\). De \(y=-\dfrac{x^2}{2}\):\[y'=-\frac{2x}{2}=-x\qquad y''=-1\]`],
+  ['Sustituir en la ecuación', R_`\[y''-4y'=(-1)-4\cdot(-x)=-1+4x\]`],
+  ['Concluir', R_`Para que \(y\) sea solución, \(y''-4y'\) tendría que dar \(0\) para <em>todo</em> \(x\). Pero \(-1+4x=0\) solo cuando \(x=\dfrac{1}{4}\); para cualquier otro valor (por ejemplo \(x=0\): \(-1+0=-1\ne0\)) no se cumple. <strong>No es solución.</strong>`],
+  ['Orden y grado', R_`La derivada más alta es \(y''\): <strong>orden 2</strong>. Está elevada a la primera potencia: <strong>grado 1</strong>.`],
+  ['¿General o particular?', R_`La función \(y=-\dfrac{x^2}{2}\) no tiene ninguna constante arbitraria, así que si fuera solución sería <strong>particular</strong>. La solución general de una ecuación de orden 2 tiene dos constantes; acá es \(y=C_1+C_2\,\ee^{4x}\) (comprobación: \(y'=4C_2\ee^{4x}\), \(y''=16C_2\ee^{4x}\), y \(16C_2\ee^{4x}-4\cdot4C_2\ee^{4x}=0\)). Como \(-\dfrac{x^2}{2}\) no verifica la ecuación, no es solución de ninguna clase.`]
+], R_`No es solución (queda \(-1+4x\), que no es \(0\) para todo \(x\)). Orden 2, grado 1. La función dada no tiene constantes: sería particular.`, true)
++ pasos(R_`Ejemplo 2 (el del modelo de parcial) · ¿\(y=x^2\) es solución de \(y=y'\,x-\dfrac{1}{4}(y')^2\)?`, [
+  ['Las derivadas que pide la ecuación', R_`Solo aparece \(y'\). De \(y=x^2\): \(y'=2x\).`],
+  ['Sustituir en el lado derecho', R_`\[y'\,x-\frac{1}{4}(y')^2=2x\cdot x-\frac{1}{4}(2x)^2=2x^2-\frac{1}{4}\cdot4x^2=2x^2-x^2=x^2\]`],
+  ['Concluir', R_`El lado derecho dio \(x^2\), que es exactamente \(y\). La igualdad \(y=x^2\) vale para todo \(x\): <strong>es solución</strong>.`],
+  ['Orden y grado', R_`La derivada más alta es \(y'\): <strong>orden 1</strong>. Aparece elevada al cuadrado en \((y')^2\): <strong>grado 2</strong>.`],
+  ['¿General o particular?', R_`\(y=x^2\) no tiene constantes arbitrarias: es una solución <strong>particular</strong>. (La familia general tiene una constante, por ser de orden 1: \(y=C\,x-\dfrac{C^2}{4}\), que se verifica con \(y'=C\).)`]
+], R_`Es solución. Orden 1, grado 2. Particular.`);
+
+const PRAC_VER = [
+  { id:'v1', tipo:'ver', et:'1', enunciado:R_`Verificar si \(y=x^2\) es solución de \((y')^3=8x^3\). Indicar orden y grado de la ecuación, y si la función dada es solución general o particular.`,
+    sol:true, orden:1, grado:3, tipoGen:false,
+    pista:R_`Calculá \(y'\), elevalo al cubo y compará con \(8x^3\). El grado es el exponente de la derivada más alta, no el de la \(x\).`,
+    fbOk:R_`Correcto: \((2x)^3=8x^3\), es solución. Orden 1, grado 3, particular (no tiene constantes).`,
+    resol:resolucion([
+      ['Derivar', R_`\(y=x^2\ \Longrightarrow\ y'=2x\).`],
+      ['Sustituir', R_`\[(y')^3=(2x)^3=2^3\,x^3=8x^3\]`],
+      ['Concluir', R_`Queda \(8x^3=8x^3\) para todo \(x\): <strong>es solución</strong>.`],
+      ['Orden y grado', R_`Derivada más alta: \(y'\), orden 1. Está elevada al cubo: grado 3.`],
+      ['¿General o particular?', R_`No tiene constantes arbitrarias: particular. (Por ejemplo \(y=x^2+C\) también verifica, con \(y'=2x\); la dada es la de \(C=0\).)`]
+    ], R_`Es solución. Orden 1, grado 3. Particular.`) },
+  { id:'v2', tipo:'ver', et:'2', enunciado:R_`Verificar si \(y=x^2+1\) es solución de \(y''-4y'=0\). Indicar orden y grado, y si la función dada es solución general o particular.`,
+    sol:false, orden:2, grado:1, tipoGen:false,
+    pista:R_`Necesitás \(y'\) e \(y''\). Al sustituir, mirá si lo que queda es \(0\) para todo \(x\) o solo para algún \(x\).`,
+    fbOk:R_`Correcto: queda \(2-8x\), que no es cero para todo \(x\): no es solución. Orden 2, grado 1; la función no tiene constantes, sería particular.`,
+    resol:resolucion([
+      ['Derivar', R_`\(y=x^2+1\ \Longrightarrow\ y'=2x\ \Longrightarrow\ y''=2\).`],
+      ['Sustituir', R_`\[y''-4y'=2-4\cdot2x=2-8x\]`],
+      ['Concluir', R_`\(2-8x=0\) solo si \(x=\dfrac{1}{4}\). En \(x=0\) da \(2\ne0\). <strong>No es solución.</strong>`],
+      ['Orden y grado', R_`Derivada más alta: \(y''\), orden 2, a la primera potencia: grado 1.`],
+      ['¿General o particular?', R_`No tiene constantes: si fuera solución, sería particular. Pero no verifica la ecuación.`]
+    ], R_`No es solución. Orden 2, grado 1. Sería particular (no tiene constantes).`) },
+  { id:'v3', tipo:'ver', et:'3', enunciado:R_`Verificar si \(y=C_1\cos2x+C_2\sen2x\) es solución de \(y''+4y=0\). Indicar orden y grado, y si la función dada es solución general o particular.`,
+    sol:true, orden:2, grado:1, tipoGen:true,
+    pista:R_`Derivá dos veces con cuidado con el \(2\) de adentro (regla de la cadena). Las constantes \(C_1\), \(C_2\) acompañan todo el camino. Dos constantes y orden 2: ¿qué te dice eso?`,
+    fbOk:R_`Correcto: \(y''=-4y\), así que \(y''+4y=0\). Orden 2, grado 1, y con dos constantes arbitrarias para una ecuación de orden 2 es la solución general.`,
+    resol:resolucion([
+      ['Derivar', R_`\[y'=-2C_1\sen2x+2C_2\cos2x\qquad y''=-4C_1\cos2x-4C_2\sen2x\]`],
+      ['Sustituir', R_`\[y''+4y=(-4C_1\cos2x-4C_2\sen2x)+4\,(C_1\cos2x+C_2\sen2x)=-4C_1\cos2x-4C_2\sen2x+4C_1\cos2x+4C_2\sen2x=0\]`],
+      ['Concluir', R_`Queda \(0=0\) para todo \(x\) y para cualquier valor de \(C_1\), \(C_2\): <strong>es solución</strong>.`],
+      ['Orden y grado', R_`Derivada más alta: \(y''\), orden 2, a la primera potencia: grado 1.`],
+      ['¿General o particular?', R_`Tiene dos constantes arbitrarias independientes, tantas como el orden: es la solución <strong>general</strong>.`]
+    ], R_`Es solución. Orden 2, grado 1. General.`) },
+  { id:'v4', tipo:'ver', et:'4', enunciado:R_`Verificar si \(y=\dfrac{C}{x}+1\) es solución de \(x\,y'+y=1\). Indicar orden y grado, y si la función dada es solución general o particular.`,
+    sol:true, orden:1, grado:1, tipoGen:true,
+    pista:R_`\(\dfrac{C}{x}=C\,x^{-1}\), así que \(y'=-C\,x^{-2}\). Al multiplicar por \(x\) y sumar \(y\), el término con \(C\) se cancela.`,
+    fbOk:R_`Correcto: \(x\,y'+y=-\dfrac{C}{x}+\dfrac{C}{x}+1=1\). Orden 1, grado 1; una constante para orden 1: general.`,
+    resol:resolucion([
+      ['Derivar', R_`\(y=C\,x^{-1}+1\ \Longrightarrow\ y'=-C\,x^{-2}=-\dfrac{C}{x^2}\).`],
+      ['Sustituir', R_`\[x\,y'+y=x\cdot\left(-\frac{C}{x^2}\right)+\frac{C}{x}+1=-\frac{C}{x}+\frac{C}{x}+1=1\]`],
+      ['Concluir', R_`Queda \(1=1\) para todo \(x\ne0\) y cualquier \(C\): <strong>es solución</strong>.`],
+      ['Orden y grado', R_`Derivada más alta: \(y'\), orden 1, a la primera potencia: grado 1.`],
+      ['¿General o particular?', R_`Una constante arbitraria para una ecuación de orden 1: solución <strong>general</strong>.`]
+    ], R_`Es solución. Orden 1, grado 1. General.`) },
+  { id:'v5', tipo:'ver', et:'5', enunciado:R_`Verificar si \(y=(x+C)^2\) es solución de \((y')^2=4y\). Indicar orden y grado, y si la función dada es solución general o particular.`,
+    sol:true, orden:1, grado:2, tipoGen:true,
+    pista:R_`\(y'=2\,(x+C)\). Elevalo al cuadrado y compará con \(4\,(x+C)^2\).`,
+    fbOk:R_`Correcto: \((y')^2=4\,(x+C)^2=4y\). Orden 1, grado 2 (por el \((y')^2\)); una constante para orden 1: general.`,
+    resol:resolucion([
+      ['Derivar', R_`\(y=(x+C)^2\ \Longrightarrow\ y'=2\,(x+C)\cdot1=2\,(x+C)\).`],
+      ['Sustituir', R_`Lado izquierdo: \((y')^2=\big(2\,(x+C)\big)^2=4\,(x+C)^2\). Lado derecho: \(4y=4\,(x+C)^2\).`],
+      ['Concluir', R_`Los dos lados coinciden para todo \(x\) y cualquier \(C\): <strong>es solución</strong>.`],
+      ['Orden y grado', R_`Derivada más alta: \(y'\), orden 1. Está al cuadrado: grado 2.`],
+      ['¿General o particular?', R_`Una constante arbitraria, orden 1: <strong>general</strong>. (Con \(C=0\) sale la particular \(y=x^2\).)`]
+    ], R_`Es solución. Orden 1, grado 2. General.`) },
+  { id:'v6', tipo:'ver', et:'6', enunciado:R_`Verificar si \(y=x\,\ee^{2x}\) es solución de \(y''-2y'+y=0\). Indicar orden y grado, y si la función dada es solución general o particular.`,
+    sol:false, orden:2, grado:1, tipoGen:false,
+    pista:R_`Derivá como producto: \(y'=\ee^{2x}+2x\,\ee^{2x}\). Sacá factor común \(\ee^{2x}\) en cada derivada antes de sustituir.`,
+    fbOk:R_`Correcto: queda \(\ee^{2x}(2+x)\), que no es cero: no es solución. Orden 2, grado 1; sin constantes, sería particular.`,
+    resol:resolucion([
+      ['Derivar', R_`\[y'=1\cdot\ee^{2x}+x\cdot2\ee^{2x}=\ee^{2x}(1+2x)\]\[y''=2\ee^{2x}(1+2x)+\ee^{2x}\cdot2=\ee^{2x}(2+4x+2)=\ee^{2x}(4+4x)\]`],
+      ['Sustituir', R_`\[y''-2y'+y=\ee^{2x}(4+4x)-2\,\ee^{2x}(1+2x)+x\,\ee^{2x}=\ee^{2x}\,(4+4x-2-4x+x)=\ee^{2x}\,(2+x)\]`],
+      ['Concluir', R_`\(\ee^{2x}(2+x)\) solo vale \(0\) en \(x=-2\); en \(x=0\) da \(2\ne0\). <strong>No es solución.</strong> (La que sí verifica es \(y=x\,\ee^{x}\): el exponente importa.)`],
+      ['Orden y grado', R_`Derivada más alta: \(y''\), orden 2, a la primera potencia: grado 1.`],
+      ['¿General o particular?', R_`No tiene constantes: si fuera solución, sería particular.`]
+    ], R_`No es solución. Orden 2, grado 1. Sería particular (no tiene constantes).`) }
+];
+
+/* ================= DOMINIO ================= */
+const TABLA_DOM = filas => `<div class="tbl"><table><thead><tr><th>Operación</th><th>¿Se puede hacer siempre?</th><th>Condición</th></tr></thead><tbody>${filas.map(f=>`<tr><td>${f[0]}</td><td>${f[1]}</td><td>${f[2]}</td></tr>`).join('')}</tbody></table></div>`;
+const LEY_DOM = '<div class="leyenda"><span class="fill" style="--c:#1d6fcc">dominio</span><span style="--c:#0f2244">frontera incluida</span><span class="dash" style="--c:#be123c">excluido</span></div>';
+const circ = r => (x,y)=>x*x+y*y-r*r;
+
+const EJ_DOM = () => pasos(R_`Ejemplo 1 (el del parcial) · dominio de \(f(x,y)=\dfrac{\sqrt{x^2+y^2-16}}{y-2}\)`, [
+  ['La tabla de operaciones', TABLA_DOM([[R_`Potencias, suma, resta (\(x^2+y^2-16\), \(y-2\))`,'Sí','—'],[R_`Raíz cuadrada \(\sqrt{x^2+y^2-16}\)`,'No',R_`\(x^2+y^2-16\ge0\)`],[R_`División por \(y-2\)`,'No',R_`\(y-2\ne0\)`]])],
+  ['Forma analítica', R_`Las dos condiciones a la vez:\[D=\left\{(x\,;\,y)\in\mathbb{R}^2\,/\,x^2+y^2\ge16\ \wedge\ y\ne2\right\}\]`],
+  ['Frontera de cada condición', R_`<strong>\(x^2+y^2=16\)</strong>: circunferencia de centro \((0\,;\,0)\) y radio \(\sqrt{16}=4\). Como la desigualdad es \(\ge\), la circunferencia <strong>pertenece</strong> (trazo continuo). ¿De qué lado? Probamos con \((0\,;\,0)\): \(0+0-16=-16\), que no es \(\ge0\): el origen no cumple, así que el dominio es el <strong>exterior</strong>.<br><strong>\(y=2\)</strong>: recta horizontal. La condición \(y\ne2\) la <strong>excluye</strong> (trazo punteado).`],
+  ['Forma gráfica', LEY_DOM + cvDom('cv-ejd1', { half:6.2, dentro:(x,y)=>x*x+y*y-16>=0, bordes:[{F:circ(4),inc:true},{F:(x,y)=>y-2,inc:false}] }) + R_`<p class="nota">El dominio son los puntos de la circunferencia y de su exterior, salvo los de la recta \(y=2\).</p>`]
+], R_`\(D=\{(x\,;\,y)\in\mathbb{R}^2\,/\,x^2+y^2\ge16\wedge y\ne2\}\): la circunferencia de radio 4 con su exterior, sin la recta \(y=2\).`, true)
++ pasos(R_`Ejemplo 2 (el del modelo de parcial) · dominio de \(f(x,y)=\dfrac{\sqrt{y-x^2}}{x+1}\)`, [
+  ['La tabla de operaciones', TABLA_DOM([[R_`Raíz cuadrada \(\sqrt{y-x^2}\)`,'No',R_`\(y-x^2\ge0\)`],[R_`División por \(x+1\)`,'No',R_`\(x+1\ne0\)`]])],
+  ['Forma analítica', R_`\[D=\left\{(x\,;\,y)\in\mathbb{R}^2\,/\,y\ge x^2\ \wedge\ x\ne-1\right\}\]`],
+  ['Frontera de cada condición', R_`<strong>\(y=x^2\)</strong>: parábola con vértice en el origen. Con \(\ge\), la parábola pertenece. Probamos \((0\,;\,1)\): \(1\ge0\) cumple, así que el dominio es la parte de <strong>arriba</strong> (el interior de la parábola).<br><strong>\(x=-1\)</strong>: recta vertical, excluida.`],
+  ['Forma gráfica', LEY_DOM + cvDom('cv-ejd2', { half:4.2, cy:2.5, dentro:(x,y)=>y-x*x>=0, bordes:[{F:(x,y)=>y-x*x,inc:true},{F:(x,y)=>x+1,inc:false}] }) + R_`<p class="nota">Los puntos de la parábola y de su interior, sin los de la recta \(x=-1\).</p>`]
+], R_`\(D=\{(x\,;\,y)\in\mathbb{R}^2\,/\,y\ge x^2\wedge x\ne-1\}\).`);
+
+const PRAC_DOM = [
+  { id:'d1', tipo:'dom', et:'1', enunciado:R_`Hallar analítica y gráficamente el dominio de \(f(x,y)=\sqrt{x+y-2}\).`,
+    items:[{t:R_`El punto \((2\,;\,0)\)`, r:true},{t:R_`El punto \((0\,;\,0)\)`, r:false},{t:R_`El punto \((3\,;\,1)\)`, r:true}],
+    pista:R_`Una sola operación problemática: la raíz. La frontera es la recta \(x+y=2\). Probá con el origen para ver de qué lado queda.`,
+    fbOk:R_`Correcto: \(D=\{(x\,;\,y)\,/\,x+y\ge2\}\), el semiplano de arriba de la recta \(x+y=2\), recta incluida.`,
+    resol:resolucion([
+      ['La tabla de operaciones', TABLA_DOM([['Suma y resta','Sí','—'],[R_`Raíz cuadrada \(\sqrt{x+y-2}\)`,'No',R_`\(x+y-2\ge0\)`]])],
+      ['Forma analítica', R_`\[D=\left\{(x\,;\,y)\in\mathbb{R}^2\,/\,x+y\ge2\right\}\]`],
+      ['Frontera y lado', R_`\(x+y=2\) es la recta \(y=-x+2\), que corta los ejes en \((2\,;\,0)\) y \((0\,;\,2)\). Pertenece (\(\ge\)). Probamos \((0\,;\,0)\): \(0+0-2=-2\), no cumple: el dominio es el otro lado, el de arriba.`],
+      ['Forma gráfica', LEY_DOM + cvDom('cv-d1', { half:4.5, cx:1, cy:1, dentro:(x,y)=>x+y-2>=0, bordes:[{F:(x,y)=>x+y-2,inc:true}], puntos:[[2,0,true],[0,0,false],[3,1,true]] })],
+      ['Los puntos preguntados', R_`\((2\,;\,0)\): \(2+0-2=0\ge0\), pertenece (está sobre la recta). \((0\,;\,0)\): \(-2<0\), no pertenece. \((3\,;\,1)\): \(3+1-2=2\ge0\), pertenece.`]
+    ], R_`\(D=\{(x\,;\,y)\in\mathbb{R}^2\,/\,x+y\ge2\}\).`) },
+  { id:'d2', tipo:'dom', et:'2', enunciado:R_`Hallar analítica y gráficamente el dominio de \(f(x,y)=\dfrac{\sqrt{9-x^2-y^2}}{x-1}\).`,
+    items:[{t:R_`El punto \((0\,;\,3)\)`, r:true},{t:R_`El punto \((1\,;\,0)\)`, r:false},{t:R_`El punto \((0\,;\,0)\)`, r:true},{t:R_`El punto \((4\,;\,0)\)`, r:false}],
+    pista:R_`Dos condiciones: \(9-x^2-y^2\ge0\) (¿es el interior o el exterior de la circunferencia?) y \(x\ne1\).`,
+    fbOk:R_`Correcto: \(D=\{(x\,;\,y)\,/\,x^2+y^2\le9\wedge x\ne1\}\), el disco de radio 3 con su borde, sin la recta \(x=1\).`,
+    resol:resolucion([
+      ['La tabla de operaciones', TABLA_DOM([[R_`Raíz cuadrada \(\sqrt{9-x^2-y^2}\)`,'No',R_`\(9-x^2-y^2\ge0\)`],[R_`División por \(x-1\)`,'No',R_`\(x-1\ne0\)`]])],
+      ['Forma analítica', R_`\(9-x^2-y^2\ge0\) equivale a \(x^2+y^2\le9\).\[D=\left\{(x\,;\,y)\in\mathbb{R}^2\,/\,x^2+y^2\le9\ \wedge\ x\ne1\right\}\]`],
+      ['Frontera y lado', R_`\(x^2+y^2=9\): circunferencia de centro \((0\,;\,0)\) y radio 3, incluida. Probamos \((0\,;\,0)\): \(0\le9\) cumple: el dominio es el <strong>interior</strong> (el disco). \(x=1\): recta vertical excluida.`],
+      ['Forma gráfica', LEY_DOM + cvDom('cv-d2', { half:4.2, dentro:(x,y)=>9-x*x-y*y>=0, bordes:[{F:circ(3),inc:true},{F:(x,y)=>x-1,inc:false}], puntos:[[0,3,true],[1,0,false],[0,0,true],[4,0,false]] })],
+      ['Los puntos preguntados', R_`\((0\,;\,3)\): \(0+9=9\le9\) y \(0\ne1\): pertenece (está sobre la circunferencia). \((1\,;\,0)\): \(x=1\), no pertenece. \((0\,;\,0)\): pertenece. \((4\,;\,0)\): \(16>9\), no pertenece.`]
+    ], R_`\(D=\{(x\,;\,y)\in\mathbb{R}^2\,/\,x^2+y^2\le9\wedge x\ne1\}\).`) },
+  { id:'d3', tipo:'dom', et:'3', enunciado:R_`Hallar analítica y gráficamente el dominio de \(f(x,y)=\ln(y-x^2)\).`,
+    items:[{t:R_`El punto \((0\,;\,1)\)`, r:true},{t:R_`El punto \((1\,;\,1)\)`, r:false},{t:R_`El punto \((0\,;\,0)\)`, r:false}],
+    pista:R_`El logaritmo pide argumento <em>estrictamente</em> positivo: \(y-x^2>0\). La parábola es la frontera, pero ¿pertenece?`,
+    fbOk:R_`Correcto: \(D=\{(x\,;\,y)\,/\,y>x^2\}\), el interior de la parábola sin la parábola.`,
+    resol:resolucion([
+      ['La tabla de operaciones', TABLA_DOM([['Resta y potencia','Sí','—'],[R_`Logaritmo \(\ln(y-x^2)\)`,'No',R_`\(y-x^2>0\)`]])],
+      ['Forma analítica', R_`\[D=\left\{(x\,;\,y)\in\mathbb{R}^2\,/\,y>x^2\right\}\]`],
+      ['Frontera y lado', R_`\(y=x^2\): parábola con vértice en el origen. Como la desigualdad es estricta, la parábola <strong>no pertenece</strong> (punteada). Probamos \((0\,;\,1)\): \(1-0=1>0\) cumple: el dominio es la parte de arriba.`],
+      ['Forma gráfica', LEY_DOM + cvDom('cv-d3', { half:3.6, cy:2, dentro:(x,y)=>y-x*x>0, bordes:[{F:(x,y)=>y-x*x,inc:false}], puntos:[[0,1,true],[1,1,false],[0,0,false]] })],
+      ['Los puntos preguntados', R_`\((0\,;\,1)\): \(1>0\), pertenece. \((1\,;\,1)\): \(1-1=0\), no es \(>0\): no pertenece (está sobre la parábola). \((0\,;\,0)\): \(0\), no pertenece (es el vértice).`]
+    ], R_`\(D=\{(x\,;\,y)\in\mathbb{R}^2\,/\,y>x^2\}\).`) },
+  { id:'d4', tipo:'dom', et:'4', enunciado:R_`Hallar analítica y gráficamente el dominio de \(f(x,y)=\dfrac{\sqrt{x^2+y^2-4}}{x+y}\).`,
+    items:[{t:R_`El punto \((2\,;\,0)\)`, r:true},{t:R_`El punto \((2\,;\,-2)\)`, r:false},{t:R_`El punto \((0\,;\,0)\)`, r:false},{t:R_`El punto \((3\,;\,1)\)`, r:true}],
+    pista:R_`Es como el del parcial: \(x^2+y^2-4\ge0\) es el exterior de una circunferencia, y el denominador excluye la recta \(x+y=0\), o sea \(y=-x\).`,
+    fbOk:R_`Correcto: \(D=\{(x\,;\,y)\,/\,x^2+y^2\ge4\wedge y\ne-x\}\): la circunferencia de radio 2 con su exterior, sin la recta \(y=-x\).`,
+    resol:resolucion([
+      ['La tabla de operaciones', TABLA_DOM([[R_`Raíz cuadrada \(\sqrt{x^2+y^2-4}\)`,'No',R_`\(x^2+y^2-4\ge0\)`],[R_`División por \(x+y\)`,'No',R_`\(x+y\ne0\)`]])],
+      ['Forma analítica', R_`\[D=\left\{(x\,;\,y)\in\mathbb{R}^2\,/\,x^2+y^2\ge4\ \wedge\ y\ne-x\right\}\]`],
+      ['Frontera y lado', R_`\(x^2+y^2=4\): circunferencia de radio 2, incluida (\(\ge\)). Probamos \((0\,;\,0)\): \(-4\), no cumple: el dominio es el <strong>exterior</strong>. \(y=-x\): recta por el origen con pendiente \(-1\), excluida.`],
+      ['Forma gráfica', LEY_DOM + cvDom('cv-d4', { half:4.2, dentro:(x,y)=>x*x+y*y-4>=0, bordes:[{F:circ(2),inc:true},{F:(x,y)=>x+y,inc:false}], puntos:[[2,0,true],[2,-2,false],[0,0,false],[3,1,true]] })],
+      ['Los puntos preguntados', R_`\((2\,;\,0)\): \(4-4=0\ge0\) y \(2+0\ne0\): pertenece. \((2\,;\,-2)\): \(x+y=0\), no pertenece. \((0\,;\,0)\): \(-4<0\), no pertenece. \((3\,;\,1)\): \(9+1-4=6\ge0\) y \(4\ne0\): pertenece.`]
+    ], R_`\(D=\{(x\,;\,y)\in\mathbb{R}^2\,/\,x^2+y^2\ge4\wedge y\ne-x\}\).`) },
+  { id:'d5', tipo:'dom', et:'5', enunciado:R_`Hallar analítica y gráficamente el dominio de \(f(x,y)=\ln(x-1)+\sqrt{4-y}\).`,
+    items:[{t:R_`El punto \((1\,;\,0)\)`, r:false},{t:R_`El punto \((2\,;\,4)\)`, r:true},{t:R_`El punto \((3\,;\,5)\)`, r:false}],
+    pista:R_`Dos condiciones independientes, una en \(x\) y otra en \(y\): \(x-1>0\) (estricta, por el logaritmo) y \(4-y\ge0\). El dominio es un "cuadrante" con un borde punteado y otro continuo.`,
+    fbOk:R_`Correcto: \(D=\{(x\,;\,y)\,/\,x>1\wedge y\le4\}\): a la derecha de \(x=1\) (sin la recta) y debajo de \(y=4\) (con la recta).`,
+    resol:resolucion([
+      ['La tabla de operaciones', TABLA_DOM([[R_`Logaritmo \(\ln(x-1)\)`,'No',R_`\(x-1>0\)`],[R_`Raíz cuadrada \(\sqrt{4-y}\)`,'No',R_`\(4-y\ge0\)`],['Suma de los dos','Sí','—']])],
+      ['Forma analítica', R_`\(x-1>0\) es \(x>1\); \(4-y\ge0\) es \(y\le4\).\[D=\left\{(x\,;\,y)\in\mathbb{R}^2\,/\,x>1\ \wedge\ y\le4\right\}\]`],
+      ['Frontera y lado', R_`\(x=1\): recta vertical, <strong>excluida</strong> (desigualdad estricta); el dominio queda a la derecha. \(y=4\): recta horizontal, <strong>incluida</strong>; el dominio queda abajo.`],
+      ['Forma gráfica', LEY_DOM + cvDom('cv-d5', { half:4.5, cx:2.5, cy:1.5, dentro:(x,y)=>x>1&&y<=4, bordes:[{F:(x,y)=>x-1,inc:false},{F:(x,y)=>x>1?y-4:NaN,inc:true}], puntos:[[1,0,false],[2,4,true],[3,5,false]] })],
+      ['Los puntos preguntados', R_`\((1\,;\,0)\): \(x=1\) no es \(>1\): no pertenece. \((2\,;\,4)\): \(2>1\) y \(4\le4\): pertenece. \((3\,;\,5)\): \(5>4\): no pertenece.`]
+    ], R_`\(D=\{(x\,;\,y)\in\mathbb{R}^2\,/\,x>1\wedge y\le4\}\).`) },
+  { id:'d6', tipo:'dom', et:'6', enunciado:R_`Hallar analítica y gráficamente el dominio de \(f(x,y)=\ln(4-x^2-y^2)+\sqrt{y}\).`,
+    items:[{t:R_`El punto \((0\,;\,0)\)`, r:true},{t:R_`El punto \((0\,;\,2)\)`, r:false},{t:R_`El punto \((1\,;\,0)\)`, r:true},{t:R_`El punto \((0\,;\,-1)\)`, r:false}],
+    pista:R_`\(4-x^2-y^2>0\) es el interior de una circunferencia, sin el borde. \(y\ge0\) es el semiplano superior, con el eje \(x\). El dominio es un semidisco con dos bordes distintos.`,
+    fbOk:R_`Correcto: \(D=\{(x\,;\,y)\,/\,x^2+y^2<4\wedge y\ge0\}\): el semidisco superior de radio 2, con el diámetro sobre el eje \(x\) incluido y el arco excluido.`,
+    resol:resolucion([
+      ['La tabla de operaciones', TABLA_DOM([[R_`Logaritmo \(\ln(4-x^2-y^2)\)`,'No',R_`\(4-x^2-y^2>0\)`],[R_`Raíz cuadrada \(\sqrt{y}\)`,'No',R_`\(y\ge0\)`]])],
+      ['Forma analítica', R_`\(4-x^2-y^2>0\) es \(x^2+y^2<4\).\[D=\left\{(x\,;\,y)\in\mathbb{R}^2\,/\,x^2+y^2<4\ \wedge\ y\ge0\right\}\]`],
+      ['Frontera y lado', R_`\(x^2+y^2=4\): circunferencia de radio 2, <strong>excluida</strong> (estricta). \((0\,;\,0)\) cumple \(0<4\): interior. \(y=0\): el eje \(x\), <strong>incluido</strong>; el dominio queda arriba. La intersección es el semidisco superior.`],
+      ['Forma gráfica', LEY_DOM + cvDom('cv-d6', { half:3.2, cy:0.8, dentro:(x,y)=>4-x*x-y*y>0&&y>=0, bordes:[{F:circ(2),inc:false},{F:(x,y)=>Math.abs(x)<2?y:NaN,inc:true}], puntos:[[0,0,true],[0,2,false],[1,0,true],[0,-1,false]] })],
+      ['Los puntos preguntados', R_`\((0\,;\,0)\): \(0<4\) y \(0\ge0\): pertenece. \((0\,;\,2)\): \(4<4\) es falso: no pertenece (está sobre la circunferencia). \((1\,;\,0)\): \(1<4\) y \(0\ge0\): pertenece (está sobre el diámetro, que sí entra). \((0\,;\,-1)\): \(y<0\), no pertenece.`]
+    ], R_`\(D=\{(x\,;\,y)\in\mathbb{R}^2\,/\,x^2+y^2<4\wedge y\ge0\}\).`) }
+];
+</script>
+
+<script>
+'use strict';
+/* ================= TRAZAS ================= */
+const PL = { xy:['Plano xy (z = 0)','x','y'], xz:['Plano xz (y = 0)','x','z'], yz:['Plano yz (x = 0)','y','z'] };
+const trz = (id, lista) => cvTrazas(id, lista.map(o=>Object.assign({t:PL[o.p][0], u:PL[o.p][1], v:PL[o.p][2]}, o)));
+const planosDe = g => [{t:'Plano xy (z = 0)',g},{t:'Plano xz (y = 0)',g},{t:'Plano yz (x = 0)',g}];
+const conR = (planos, rs) => planos.map((p,i)=>Object.assign({}, p, {r:rs[i]}));
+
+const EJ_TRA = () => pasos(R_`Ejemplo 1 (parcial, inciso a) · trazas de \(3x-2y+z-6=0\)`, [
+  ['Traza con el plano \\(xy\\)', R_`\[\sis{3x-2y+z-6=0 \\ z=0}\ \Longrightarrow\ 3x-2y-6=0\ \Longrightarrow\ 2y=3x-6\ \Longrightarrow\ y=\frac{3}{2}x-3\]Es una <strong>recta</strong> en el plano \(xy\): corta el eje \(x\) en \(x=2\) (con \(y=0\): \(3x=6\)) y el eje \(y\) en \(y=-3\).`],
+  ['Traza con el plano \\(xz\\)', R_`\[\sis{3x-2y+z-6=0 \\ y=0}\ \Longrightarrow\ 3x+z-6=0\ \Longrightarrow\ z=6-3x\]<strong>Recta</strong> en el plano \(xz\): pasa por \((2\,;\,0)\) y \((0\,;\,6)\) (coordenadas \(x\), \(z\)).`],
+  ['Traza con el plano \\(yz\\)', R_`\[\sis{3x-2y+z-6=0 \\ x=0}\ \Longrightarrow\ -2y+z-6=0\ \Longrightarrow\ z=2y+6\]<strong>Recta</strong> en el plano \(yz\): pasa por \((-3\,;\,0)\) y \((0\,;\,6)\) (coordenadas \(y\), \(z\)).`],
+  ['Gráficos y clasificación', trz('cv-ejt1', [{p:'xy',F:(x,y)=>3*x-2*y-6,half:7,puntos:[[2,0],[0,-3]]},{p:'xz',F:(x,z)=>3*x+z-6,half:7,puntos:[[2,0],[0,6]]},{p:'yz',F:(y,z)=>-2*y+z-6,half:7,puntos:[[-3,0],[0,6]]}]) + R_`La superficie es un <strong>plano</strong> (las tres variables a la primera potencia) y sus tres trazas son rectas: las que lo cortan con cada plano coordenado.`]
+], R_`Tres rectas: \(y=\dfrac{3}{2}x-3\) en \(xy\); \(z=6-3x\) en \(xz\); \(z=2y+6\) en \(yz\). Superficie: plano.`, true)
++ pasos(R_`Ejemplo 2 (parcial, inciso b) · trazas de \(\dfrac{x^2}{4}+\dfrac{y^2}{4}+\dfrac{z^2}{16}=1\)`, [
+  ['Traza con el plano \\(xy\\)', R_`\[\sis{\frac{x^2}{4}+\frac{y^2}{4}+\frac{z^2}{16}=1 \\ z=0}\ \Longrightarrow\ \frac{x^2}{4}+\frac{y^2}{4}=1\ \Longrightarrow\ x^2+y^2=4\]<strong>Circunferencia</strong> de centro \((0\,;\,0)\) y radio \(2\) (los dos denominadores son iguales).`],
+  ['Traza con el plano \\(xz\\)', R_`\[\sis{\frac{x^2}{4}+\frac{y^2}{4}+\frac{z^2}{16}=1 \\ y=0}\ \Longrightarrow\ \frac{x^2}{4}+\frac{z^2}{16}=1\]<strong>Elipse</strong> con semieje \(\sqrt{4}=2\) sobre el eje \(x\) y semieje \(\sqrt{16}=4\) sobre el eje \(z\).`],
+  ['Traza con el plano \\(yz\\)', R_`\[\sis{\frac{x^2}{4}+\frac{y^2}{4}+\frac{z^2}{16}=1 \\ x=0}\ \Longrightarrow\ \frac{y^2}{4}+\frac{z^2}{16}=1\]<strong>Elipse</strong> con semiejes \(2\) (eje \(y\)) y \(4\) (eje \(z\)).`],
+  ['Gráficos y clasificación', trz('cv-ejt2', [{p:'xy',F:(x,y)=>x*x/4+y*y/4-1,half:4.8},{p:'xz',F:(x,z)=>x*x/4+z*z/16-1,half:4.8},{p:'yz',F:(y,z)=>y*y/4+z*z/16-1,half:4.8}]) + R_`La superficie es un <strong>elipsoide</strong>: suma de los tres cuadrados igual a 1, con denominadores distintos. Como los de \(x\) y de \(y\) coinciden, es de revolución alrededor del eje \(z\).`]
+], R_`Circunferencia \(x^2+y^2=4\) en \(xy\); elipses \(\dfrac{x^2}{4}+\dfrac{z^2}{16}=1\) en \(xz\) y \(\dfrac{y^2}{4}+\dfrac{z^2}{16}=1\) en \(yz\). Superficie: elipsoide.`);
+
+const PRAC_TRA = [
+  { id:'t1', tipo:'traza', et:'1', enunciado:R_`Hallar las trazas de \(2x+3y+z-6=0\) con los planos coordenados, graficarlas y clasificarlas.`,
+    planos:conR(planosDe(), ['recta','recta','recta']),
+    pista:R_`Es un plano: las tres variables aparecen a la primera potencia. En cada traza anulá una variable y despejá.`,
+    fbOk:R_`Correcto: las tres trazas de un plano son rectas.`,
+    resol:resolucion([
+      ['Traza con el plano \\(xy\\)', R_`\[\sis{2x+3y+z-6=0 \\ z=0}\ \Longrightarrow\ 2x+3y=6\ \Longrightarrow\ y=-\frac{2}{3}x+2\]Recta: corta el eje \(x\) en \(3\) y el eje \(y\) en \(2\).`],
+      ['Traza con el plano \\(xz\\)', R_`\[\sis{2x+3y+z-6=0 \\ y=0}\ \Longrightarrow\ 2x+z=6\ \Longrightarrow\ z=6-2x\]Recta: corta el eje \(x\) en \(3\) y el eje \(z\) en \(6\).`],
+      ['Traza con el plano \\(yz\\)', R_`\[\sis{2x+3y+z-6=0 \\ x=0}\ \Longrightarrow\ 3y+z=6\ \Longrightarrow\ z=6-3y\]Recta: corta el eje \(y\) en \(2\) y el eje \(z\) en \(6\).`],
+      ['Gráficos', trz('cv-t1', [{p:'xy',F:(x,y)=>2*x+3*y-6,half:7,puntos:[[3,0],[0,2]]},{p:'xz',F:(x,z)=>2*x+z-6,half:7,puntos:[[3,0],[0,6]]},{p:'yz',F:(y,z)=>3*y+z-6,half:7,puntos:[[2,0],[0,6]]}])],
+      ['Clasificación', R_`Superficie: plano. Trazas: tres rectas.`]
+    ], R_`Rectas \(2x+3y=6\), \(2x+z=6\) y \(3y+z=6\).`) },
+  { id:'t2', tipo:'traza', et:'2', enunciado:R_`Hallar las trazas de \(x-2z+4=0\) con los planos coordenados, graficarlas y clasificarlas.`,
+    planos:conR(planosDe(), ['recta','recta','recta']),
+    pista:R_`Falta la \(y\): es un plano paralelo al eje \(y\). Al hacer \(z=0\) queda una ecuación solo en \(x\): igual es una recta en el plano \(xy\) (vertical). Lo mismo con \(x=0\) en el plano \(yz\).`,
+    fbOk:R_`Correcto: tres rectas. Dos de ellas son paralelas al eje \(y\), porque la ecuación no tiene \(y\).`,
+    resol:resolucion([
+      ['Traza con el plano \\(xy\\)', R_`\[\sis{x-2z+4=0 \\ z=0}\ \Longrightarrow\ x+4=0\ \Longrightarrow\ x=-4\]Es la recta vertical \(x=-4\) del plano \(xy\) (paralela al eje \(y\)): todos los puntos \((-4\,;\,y)\).`],
+      ['Traza con el plano \\(xz\\)', R_`\[\sis{x-2z+4=0 \\ y=0}\ \Longrightarrow\ x-2z+4=0\ \Longrightarrow\ z=\frac{x+4}{2}=\frac{x}{2}+2\]Recta: corta el eje \(x\) en \(-4\) y el eje \(z\) en \(2\).`],
+      ['Traza con el plano \\(yz\\)', R_`\[\sis{x-2z+4=0 \\ x=0}\ \Longrightarrow\ -2z+4=0\ \Longrightarrow\ z=2\]Recta horizontal \(z=2\) del plano \(yz\) (paralela al eje \(y\)).`],
+      ['Gráficos', trz('cv-t2', [{p:'xy',F:(x,y)=>x+4,half:6,puntos:[[-4,0]]},{p:'xz',F:(x,z)=>x-2*z+4,half:6,puntos:[[-4,0],[0,2]]},{p:'yz',F:(y,z)=>z-2,half:6,puntos:[[0,2]]}])],
+      ['Clasificación', R_`Superficie: plano paralelo al eje \(y\). Trazas: tres rectas.`]
+    ], R_`\(x=-4\) en \(xy\); \(z=\dfrac{x}{2}+2\) en \(xz\); \(z=2\) en \(yz\).`) },
+  { id:'t3', tipo:'traza', et:'3', enunciado:R_`Hallar las trazas de \(\dfrac{x^2}{9}+\dfrac{y^2}{4}+z^2=1\) con los planos coordenados, graficarlas y clasificarlas.`,
+    planos:conR(planosDe(), ['elipse','elipse','elipse']),
+    pista:R_`Suma de tres cuadrados con denominadores distintos: elipsoide. Cada traza es la ecuación que queda al borrar un término, y los semiejes son las raíces de los denominadores (\(z^2\) es \(\dfrac{z^2}{1}\)).`,
+    fbOk:R_`Correcto: las tres trazas son elipses, con semiejes \(3\), \(2\) y \(1\) según el plano.`,
+    resol:resolucion([
+      ['Traza con el plano \\(xy\\)', R_`\[\sis{\frac{x^2}{9}+\frac{y^2}{4}+z^2=1 \\ z=0}\ \Longrightarrow\ \frac{x^2}{9}+\frac{y^2}{4}=1\]Elipse de semiejes \(\sqrt{9}=3\) (eje \(x\)) y \(\sqrt{4}=2\) (eje \(y\)).`],
+      ['Traza con el plano \\(xz\\)', R_`\[\sis{\frac{x^2}{9}+\frac{y^2}{4}+z^2=1 \\ y=0}\ \Longrightarrow\ \frac{x^2}{9}+z^2=1\]Elipse de semiejes \(3\) (eje \(x\)) y \(1\) (eje \(z\)).`],
+      ['Traza con el plano \\(yz\\)', R_`\[\sis{\frac{x^2}{9}+\frac{y^2}{4}+z^2=1 \\ x=0}\ \Longrightarrow\ \frac{y^2}{4}+z^2=1\]Elipse de semiejes \(2\) (eje \(y\)) y \(1\) (eje \(z\)).`],
+      ['Gráficos', trz('cv-t3', [{p:'xy',F:(x,y)=>x*x/9+y*y/4-1,half:4},{p:'xz',F:(x,z)=>x*x/9+z*z-1,half:4},{p:'yz',F:(y,z)=>y*y/4+z*z-1,half:4}])],
+      ['Clasificación', R_`Superficie: elipsoide. Trazas: tres elipses.`]
+    ], R_`Elipses \(\dfrac{x^2}{9}+\dfrac{y^2}{4}=1\), \(\dfrac{x^2}{9}+z^2=1\) y \(\dfrac{y^2}{4}+z^2=1\).`) },
+  { id:'t4', tipo:'traza', et:'4', enunciado:R_`Hallar las trazas de \(z=x^2+y^2-4\) con los planos coordenados, graficarlas y clasificarlas.`,
+    planos:conR(planosDe(), ['circunferencia','parábola','parábola']),
+    pista:R_`Con \(z=0\) queda \(x^2+y^2=4\). Con \(y=0\) queda \(z\) en función de \(x^2\): una variable al cuadrado y la otra sin elevar.`,
+    fbOk:R_`Correcto: circunferencia en \(xy\), parábolas en \(xz\) y en \(yz\). Es un paraboloide con vértice en \((0\,;\,0\,;\,-4)\).`,
+    resol:resolucion([
+      ['Traza con el plano \\(xy\\)', R_`\[\sis{z=x^2+y^2-4 \\ z=0}\ \Longrightarrow\ 0=x^2+y^2-4\ \Longrightarrow\ x^2+y^2=4\]Circunferencia de centro \((0\,;\,0)\) y radio \(2\).`],
+      ['Traza con el plano \\(xz\\)', R_`\[\sis{z=x^2+y^2-4 \\ y=0}\ \Longrightarrow\ z=x^2-4\]Parábola con vértice en \((0\,;\,-4)\), abre hacia arriba, corta el eje \(x\) en \(\pm2\).`],
+      ['Traza con el plano \\(yz\\)', R_`\[\sis{z=x^2+y^2-4 \\ x=0}\ \Longrightarrow\ z=y^2-4\]Parábola con vértice en \((0\,;\,-4)\), corta el eje \(y\) en \(\pm2\).`],
+      ['Gráficos', trz('cv-t4', [{p:'xy',F:(x,y)=>x*x+y*y-4,half:4},{p:'xz',F:(x,z)=>z-(x*x-4),half:5.5,cy:0.5,puntos:[[0,-4],[2,0],[-2,0]]},{p:'yz',F:(y,z)=>z-(y*y-4),half:5.5,cy:0.5,puntos:[[0,-4],[2,0],[-2,0]]}])],
+      ['Clasificación', R_`Superficie: paraboloide (una variable a la primera potencia, dos al cuadrado con el mismo signo). Trazas: una circunferencia y dos parábolas.`]
+    ], R_`\(x^2+y^2=4\) en \(xy\); \(z=x^2-4\) en \(xz\); \(z=y^2-4\) en \(yz\).`) },
+  { id:'t5', tipo:'traza', et:'5', enunciado:R_`Hallar las trazas de \(\dfrac{x^2}{4}+\dfrac{y^2}{4}-\dfrac{z^2}{9}=1\) con los planos coordenados, graficarlas y clasificarlas.`,
+    planos:conR(planosDe(), ['circunferencia','hipérbola','hipérbola']),
+    pista:R_`Dos cuadrados positivos y uno negativo: hiperboloide de una hoja. Con \(z=0\) desaparece el término negativo; con \(y=0\) o \(x=0\) queda una diferencia de cuadrados igual a 1.`,
+    fbOk:R_`Correcto: circunferencia en \(xy\), hipérbolas en \(xz\) y \(yz\). Hiperboloide de una hoja.`,
+    resol:resolucion([
+      ['Traza con el plano \\(xy\\)', R_`\[\sis{\frac{x^2}{4}+\frac{y^2}{4}-\frac{z^2}{9}=1 \\ z=0}\ \Longrightarrow\ \frac{x^2}{4}+\frac{y^2}{4}=1\ \Longrightarrow\ x^2+y^2=4\]Circunferencia de radio \(2\).`],
+      ['Traza con el plano \\(xz\\)', R_`\[\sis{\frac{x^2}{4}+\frac{y^2}{4}-\frac{z^2}{9}=1 \\ y=0}\ \Longrightarrow\ \frac{x^2}{4}-\frac{z^2}{9}=1\]Hipérbola con vértices en \(x=\pm2\) (con \(z=0\): \(x^2=4\)); no corta el eje \(z\).`],
+      ['Traza con el plano \\(yz\\)', R_`\[\sis{\frac{x^2}{4}+\frac{y^2}{4}-\frac{z^2}{9}=1 \\ x=0}\ \Longrightarrow\ \frac{y^2}{4}-\frac{z^2}{9}=1\]Hipérbola con vértices en \(y=\pm2\).`],
+      ['Gráficos', trz('cv-t5', [{p:'xy',F:(x,y)=>x*x/4+y*y/4-1,half:4.5},{p:'xz',F:(x,z)=>x*x/4-z*z/9-1,half:6,puntos:[[2,0],[-2,0]]},{p:'yz',F:(y,z)=>y*y/4-z*z/9-1,half:6,puntos:[[2,0],[-2,0]]}])],
+      ['Clasificación', R_`Superficie: hiperboloide de una hoja. Trazas: una circunferencia y dos hipérbolas.`]
+    ], R_`\(x^2+y^2=4\) en \(xy\); \(\dfrac{x^2}{4}-\dfrac{z^2}{9}=1\) en \(xz\); \(\dfrac{y^2}{4}-\dfrac{z^2}{9}=1\) en \(yz\).`) },
+  { id:'t6', tipo:'traza', et:'6', enunciado:R_`Hallar las trazas de \(\dfrac{x^2}{4}-\dfrac{y^2}{9}-\dfrac{z^2}{9}=1\) con los planos coordenados, graficarlas y clasificarlas.`,
+    planos:conR(planosDe(), ['hipérbola','hipérbola','no hay traza']),
+    pista:R_`Un cuadrado positivo y dos negativos: hiperboloide de dos hojas. Fijate qué pasa con \(x=0\): ¿puede una suma de términos negativos dar \(1\)?`,
+    fbOk:R_`Correcto: hipérbolas en \(xy\) y en \(xz\), y con \(x=0\) no hay traza: el plano \(yz\) pasa entre las dos hojas.`,
+    resol:resolucion([
+      ['Traza con el plano \\(xy\\)', R_`\[\sis{\frac{x^2}{4}-\frac{y^2}{9}-\frac{z^2}{9}=1 \\ z=0}\ \Longrightarrow\ \frac{x^2}{4}-\frac{y^2}{9}=1\]Hipérbola con vértices en \(x=\pm2\).`],
+      ['Traza con el plano \\(xz\\)', R_`\[\sis{\frac{x^2}{4}-\frac{y^2}{9}-\frac{z^2}{9}=1 \\ y=0}\ \Longrightarrow\ \frac{x^2}{4}-\frac{z^2}{9}=1\]Hipérbola con vértices en \(x=\pm2\).`],
+      ['Traza con el plano \\(yz\\)', R_`\[\sis{\frac{x^2}{4}-\frac{y^2}{9}-\frac{z^2}{9}=1 \\ x=0}\ \Longrightarrow\ -\frac{y^2}{9}-\frac{z^2}{9}=1\ \Longrightarrow\ y^2+z^2=-9\]Una suma de cuadrados nunca es negativa: <strong>no hay ningún punto real</strong>. La superficie no corta el plano \(yz\): no hay traza.`],
+      ['Gráficos', trz('cv-t6', [{p:'xy',F:(x,y)=>x*x/4-y*y/9-1,half:6,puntos:[[2,0],[-2,0]]},{p:'xz',F:(x,z)=>x*x/4-z*z/9-1,half:6,puntos:[[2,0],[-2,0]]},{p:'yz',vacio:true,half:6}])],
+      ['Clasificación', R_`Superficie: hiperboloide de dos hojas (las hojas están a la izquierda de \(x=-2\) y a la derecha de \(x=2\)). Trazas: dos hipérbolas; con el plano \(yz\) no hay traza.`]
+    ], R_`\(\dfrac{x^2}{4}-\dfrac{y^2}{9}=1\) en \(xy\); \(\dfrac{x^2}{4}-\dfrac{z^2}{9}=1\) en \(xz\); con \(x=0\) no hay traza.`) }
+];
+
+/* ================= SIMULACROS ================= */
+const SIM_A = [
+  { id:'sa1', tipo:'num', et:'E1', enunciado:R_`a) Hallar la solución general de la ecuación diferencial \(x\,y'+2y=x^4+x^2\). b) Hallar la solución particular que pasa por el punto \((1\,;\,1)\). <span class="nota">Para comprobar: con la particular, calculá \(y(2)\) (con cuatro decimales).</span>`,
+    campos:[{et:R_`\(y(2)=\)`, r:3.8125, tol:0.01, nombre:'y(2)'}],
+    pista:R_`Forma normal \(y'+\dfrac{2}{x}\,y=x^3+x\); factor integrante \(x^2\); \((x^2y)'=x^5+x^3\).`,
+    fbOk:R_`Correcto: \(y=\dfrac{x^4}{6}+\dfrac{x^2}{4}+\dfrac{7}{12\,x^2}\), y \(y(2)=\dfrac{16}{6}+1+\dfrac{7}{48}=3{,}8125\).`,
+    resol:resolucion([
+      ['Forma normal', R_`Dividimos por \(x\): \(y'+\dfrac{2}{x}\,y=x^3+x\). \(P(x)=\dfrac{2}{x}\), \(Q(x)=x^3+x\).`],
+      ['Factor integrante', R_`\[\varphi'=\frac{2}{x}\,\varphi\ \Longrightarrow\ \ln\varphi=2\ln x=\ln x^2\ \Longrightarrow\ \varphi=x^2\]`],
+      ['Multiplicar y reconocer la derivada de un producto', R_`\[x^2\,y'+2x\,y=x^2\,(x^3+x)=x^5+x^3\qquad\text{y el lado izquierdo es }(x^2y)'\]`],
+      ['Integrar', R_`\[x^2y=\int(x^5+x^3)\,\dd x=\frac{x^6}{6}+\frac{x^4}{4}+C\]`],
+      ['Despejar: solución general', R_`\[y=\frac{x^6}{6x^2}+\frac{x^4}{4x^2}+\frac{C}{x^2}=\frac{x^4}{6}+\frac{x^2}{4}+\frac{C}{x^2}\]`],
+      ['Solución particular por \\((1\\,;\\,1)\\)', R_`\[1=\frac{1}{6}+\frac{1}{4}+C\ \Longrightarrow\ C=1-\frac{1}{6}-\frac{1}{4}=\frac{12}{12}-\frac{2}{12}-\frac{3}{12}=\frac{7}{12}\qquad y=\frac{x^4}{6}+\frac{x^2}{4}+\frac{7}{12\,x^2}\]`],
+      ['El valor pedido', R_`\[y(2)=\frac{2^4}{6}+\frac{2^2}{4}+\frac{7}{12\cdot2^2}=\frac{16}{6}+\frac{4}{4}+\frac{7}{48}\approx2{,}6667+1+0{,}1458=3{,}8125\]`]
+    ], R_`General \(y=\dfrac{x^4}{6}+\dfrac{x^2}{4}+\dfrac{C}{x^2}\); particular con \(C=\dfrac{7}{12}\); \(y(2)=3{,}8125\).`) },
+  { id:'sa2s', tipo:'num', et:'E2', enunciado:R_`Resolver la ecuación diferencial \(y'=2x\,y^2\) con la condición \(y(0)=1\). <span class="nota">Para comprobar: con la solución, calculá \(y\!\left(\dfrac{1}{2}\right)\) (con tres decimales).</span>`,
+    campos:[{et:R_`\(y\!\left(\frac{1}{2}\right)=\)`, r:1.33333, tol:0.01, nombre:'y(1/2)'}],
+    pista:R_`\(\dfrac{1}{y^2}\,\dd y=2x\,\dd x\). La integral de \(y^{-2}\) es \(-y^{-1}\).`,
+    fbOk:R_`Correcto: \(y=\dfrac{1}{1-x^2}\), y \(y\!\left(\dfrac{1}{2}\right)=\dfrac{1}{1-\frac{1}{4}}=\dfrac{4}{3}\approx1{,}333\).`,
+    resol:resolucion([
+      ['Separar', R_`\[\frac{\dd y}{\dd x}=2x\,y^2\ \Longrightarrow\ \frac{1}{y^2}\,\dd y=2x\,\dd x\qquad(y\ne0)\]`],
+      ['Integrar', R_`\[\int y^{-2}\,\dd y=\int2x\,\dd x\ \Longrightarrow\ \frac{y^{-1}}{-1}=x^2+C\ \Longrightarrow\ -\frac{1}{y}=x^2+C\]`],
+      ['Condición inicial', R_`\(y(0)=1\): \(-\dfrac{1}{1}=0+C\), así que \(C=-1\) y \(-\dfrac{1}{y}=x^2-1\).`],
+      ['Despejar', R_`\[\frac{1}{y}=1-x^2\ \Longrightarrow\ y=\frac{1}{1-x^2}\]Control: \(y(0)=\dfrac{1}{1-0}=1\). (Vale para \(-1&lt;x&lt;1\), donde el denominador no se anula.)`],
+      ['El valor pedido', R_`\[y\!\left(\frac{1}{2}\right)=\frac{1}{1-\frac{1}{4}}=\frac{1}{\frac{3}{4}}=\frac{4}{3}\approx1{,}333\]`]
+    ], R_`\(y=\dfrac{1}{1-x^2}\); \(y\!\left(\dfrac{1}{2}\right)=\dfrac{4}{3}\approx1{,}333\).`) },
+  { id:'sa2', tipo:'ver', et:'E3', enunciado:R_`Verificar que la ecuación \(y''+y'=0\) tiene como solución \(y=3-\ee^{-x}\). Indicar orden y grado de la ecuación diferencial. ¿La solución dada es general o particular? Explicar.`,
+    sol:true, orden:2, grado:1, tipoGen:false,
+    pista:R_`\(y'=\ee^{-x}\) (el signo menos del exponente se cancela con el de adelante) e \(y''=-\ee^{-x}\).`,
+    fbOk:R_`Correcto: \(y''+y'=-\ee^{-x}+\ee^{-x}=0\). Orden 2, grado 1. Sin constantes arbitrarias: particular (la general sería \(y=C_1+C_2\,\ee^{-x}\)).`,
+    resol:resolucion([
+      ['Derivar', R_`\(y=3-\ee^{-x}\ \Longrightarrow\ y'=0-(-\ee^{-x})=\ee^{-x}\ \Longrightarrow\ y''=-\ee^{-x}\).`],
+      ['Sustituir', R_`\[y''+y'=-\ee^{-x}+\ee^{-x}=0\]`],
+      ['Concluir', R_`Queda \(0=0\) para todo \(x\): <strong>es solución</strong>.`],
+      ['Orden y grado', R_`Derivada más alta \(y''\): orden 2; a la primera potencia: grado 1.`],
+      ['¿General o particular?', R_`No tiene constantes arbitrarias: es <strong>particular</strong>. La general tiene dos constantes (orden 2): \(y=C_1+C_2\,\ee^{-x}\); la dada es la de \(C_1=3\), \(C_2=-1\).`]
+    ], R_`Es solución. Orden 2, grado 1. Particular.`) },
+  { id:'sa3', tipo:'dom', et:'E4', enunciado:R_`Sea \(f:D\subseteq\mathbb{R}^2\to\mathbb{R}\,/\,f(x,y)=\dfrac{\sqrt{x^2+y^2-9}}{x+1}\). Hallar el dominio analítica y gráficamente.`,
+    items:[{t:R_`El punto \((3\,;\,0)\)`, r:true},{t:R_`El punto \((-1\,;\,3)\)`, r:false},{t:R_`El punto \((0\,;\,0)\)`, r:false}],
+    pista:R_`Raíz: \(x^2+y^2\ge9\). Denominador: \(x\ne-1\).`,
+    fbOk:R_`Correcto: \(D=\{(x\,;\,y)\,/\,x^2+y^2\ge9\wedge x\ne-1\}\): la circunferencia de radio 3 con su exterior, sin la recta \(x=-1\).`,
+    resol:resolucion([
+      ['La tabla de operaciones', TABLA_DOM([[R_`Raíz cuadrada \(\sqrt{x^2+y^2-9}\)`,'No',R_`\(x^2+y^2-9\ge0\)`],[R_`División por \(x+1\)`,'No',R_`\(x+1\ne0\)`]])],
+      ['Forma analítica', R_`\[D=\left\{(x\,;\,y)\in\mathbb{R}^2\,/\,x^2+y^2\ge9\ \wedge\ x\ne-1\right\}\]`],
+      ['Frontera y lado', R_`\(x^2+y^2=9\): circunferencia de radio 3, incluida. \((0\,;\,0)\) da \(-9\), no cumple: exterior. \(x=-1\): recta vertical excluida.`],
+      ['Forma gráfica', LEY_DOM + cvDom('cv-sa3', { half:5, dentro:(x,y)=>x*x+y*y-9>=0, bordes:[{F:circ(3),inc:true},{F:(x,y)=>x+1,inc:false}], puntos:[[3,0,true],[-1,3,false],[0,0,false]] })],
+      ['Los puntos preguntados', R_`\((3\,;\,0)\): \(9-9=0\ge0\) y \(3\ne-1\): pertenece. \((-1\,;\,3)\): \(x=-1\), no pertenece aunque cumpla la raíz. \((0\,;\,0)\): \(-9<0\), no pertenece.`]
+    ], R_`\(D=\{(x\,;\,y)\in\mathbb{R}^2\,/\,x^2+y^2\ge9\wedge x\ne-1\}\).`) },
+  { id:'sa4', tipo:'traza', et:'E5', enunciado:R_`Hallar las trazas de las superficies dadas. Graficarlas en los planos correspondientes y clasificarlas. a) \(x+2y-2z-4=0\); b) \(x^2+y^2+z^2=16\).`,
+    grupos:[{t:R_`Superficie a) \(x+2y-2z-4=0\)`},{t:R_`Superficie b) \(x^2+y^2+z^2=16\)`}], planos:conR(planosDe(0).concat(planosDe(1)), ['recta','recta','recta','circunferencia','circunferencia','circunferencia']),
+    pista:R_`a) es un plano: tres rectas. b) es una esfera de radio 4: cada traza es una circunferencia de radio 4.`,
+    fbOk:R_`Correcto: tres rectas para el plano y tres circunferencias de radio 4 para la esfera.`,
+    resol:resolucion([
+      ['a) Traza con el plano \\(xy\\)', R_`\[\sis{x+2y-2z-4=0 \\ z=0}\ \Longrightarrow\ x+2y=4\ \Longrightarrow\ y=-\frac{x}{2}+2\]Recta: corta el eje \(x\) en \(4\) y el eje \(y\) en \(2\).`],
+      ['a) Traza con el plano \\(xz\\)', R_`\[\sis{x+2y-2z-4=0 \\ y=0}\ \Longrightarrow\ x-2z=4\ \Longrightarrow\ z=\frac{x}{2}-2\]Recta: corta el eje \(x\) en \(4\) y el eje \(z\) en \(-2\).`],
+      ['a) Traza con el plano \\(yz\\)', R_`\[\sis{x+2y-2z-4=0 \\ x=0}\ \Longrightarrow\ 2y-2z=4\ \Longrightarrow\ z=y-2\]Recta: corta el eje \(y\) en \(2\) y el eje \(z\) en \(-2\).`],
+      ['a) Gráficos', trz('cv-sa4a', [{p:'xy',F:(x,y)=>x+2*y-4,half:6,puntos:[[4,0],[0,2]]},{p:'xz',F:(x,z)=>x-2*z-4,half:6,puntos:[[4,0],[0,-2]]},{p:'yz',F:(y,z)=>z-y+2,half:6,puntos:[[2,0],[0,-2]]}]) + 'Superficie: plano. Trazas: rectas.'],
+      ['b) Las tres trazas', R_`\[\sis{x^2+y^2+z^2=16 \\ z=0}\ \Longrightarrow\ x^2+y^2=16\qquad\sis{x^2+y^2+z^2=16 \\ y=0}\ \Longrightarrow\ x^2+z^2=16\qquad\sis{x^2+y^2+z^2=16 \\ x=0}\ \Longrightarrow\ y^2+z^2=16\]Las tres son circunferencias de centro en el origen y radio \(\sqrt{16}=4\).`],
+      ['b) Gráficos', trz('cv-sa4b', [{p:'xy',F:(x,y)=>x*x+y*y-16,half:5.5},{p:'xz',F:(x,z)=>x*x+z*z-16,half:5.5},{p:'yz',F:(y,z)=>y*y+z*z-16,half:5.5}]) + 'Superficie: esfera de radio 4. Trazas: tres circunferencias de radio 4.']
+    ], R_`a) rectas \(x+2y=4\), \(x-2z=4\), \(2y-2z=4\). b) circunferencias de radio 4 en los tres planos.`) }
+];
+const SIM_B = [
+  { id:'sb1', tipo:'num', et:'E1', enunciado:R_`a) Hallar la solución general de la ecuación diferencial \(x\,y'-y=x^3+x\). b) Hallar la solución particular que pasa por el punto \((1\,;\,2)\). <span class="nota">Para comprobar: con la particular, calculá \(y(2)\) (con tres decimales).</span>`,
+    campos:[{et:R_`\(y(2)=\)`, r:8.3863, tol:0.02, nombre:'y(2)'}],
+    pista:R_`Forma normal \(y'-\dfrac{1}{x}\,y=x^2+1\); factor integrante \(\dfrac{1}{x}\); \(\left(\dfrac{y}{x}\right)'=x+\dfrac{1}{x}\). Va a aparecer un logaritmo.`,
+    fbOk:R_`Correcto: \(y=\dfrac{x^3}{2}+x\ln x+\dfrac{3}{2}x\), y \(y(2)=4+2\ln2+3\approx8{,}386\).`,
+    resol:resolucion([
+      ['Forma normal', R_`Dividimos por \(x\): \(y'-\dfrac{1}{x}\,y=x^2+1\). \(P(x)=-\dfrac{1}{x}\), \(Q(x)=x^2+1\).`],
+      ['Factor integrante', R_`\[\varphi'=-\frac{1}{x}\,\varphi\ \Longrightarrow\ \ln\varphi=-\ln x=\ln x^{-1}\ \Longrightarrow\ \varphi=\frac{1}{x}\]`],
+      ['Multiplicar y reconocer la derivada de un producto', R_`\[\frac{1}{x}\,y'-\frac{1}{x^2}\,y=\frac{x^2+1}{x}=x+\frac{1}{x}\qquad\text{y el lado izquierdo es }\left(\frac{y}{x}\right)'\]`],
+      ['Integrar', R_`\[\frac{y}{x}=\int\left(x+\frac{1}{x}\right)\dd x=\frac{x^2}{2}+\ln|x|+C\]`],
+      ['Despejar: solución general', R_`\[y=x\left(\frac{x^2}{2}+\ln|x|+C\right)=\frac{x^3}{2}+x\ln|x|+C\,x\]`],
+      ['Solución particular por \\((1\\,;\\,2)\\)', R_`\[2=\frac{1}{2}+1\cdot\ln1+C\cdot1=\frac{1}{2}+0+C\ \Longrightarrow\ C=\frac{3}{2}\qquad y=\frac{x^3}{2}+x\ln x+\frac{3}{2}x\]`],
+      ['El valor pedido', R_`\[y(2)=\frac{2^3}{2}+2\ln2+\frac{3}{2}\cdot2=4+2\cdot0{,}6931+3\approx4+1{,}386+3=8{,}386\]`]
+    ], R_`General \(y=\dfrac{x^3}{2}+x\ln|x|+C\,x\); particular con \(C=\dfrac{3}{2}\); \(y(2)\approx8{,}386\).`) },
+  { id:'sb2s', tipo:'num', et:'E2', enunciado:R_`Resolver la ecuación diferencial \(y'=y\cos x\) con la condición \(y(0)=2\). <span class="nota">Para comprobar: con la solución, calculá \(y\!\left(\dfrac{\pi}{2}\right)\) (con tres decimales).</span>`,
+    campos:[{et:R_`\(y\!\left(\frac{\pi}{2}\right)=\)`, r:5.43656, tol:0.02, nombre:'y(π/2)'}],
+    pista:R_`\(\dfrac{1}{y}\,\dd y=\cos x\,\dd x\). Al integrar queda \(\ln|y|\); la exponencial convierte la constante en un factor \(K\).`,
+    fbOk:R_`Correcto: \(y=2\,\ee^{\sen x}\), y \(y\!\left(\dfrac{\pi}{2}\right)=2\,\ee^{1}=2\ee\approx5{,}437\).`,
+    resol:resolucion([
+      ['Separar', R_`\[\frac{\dd y}{\dd x}=y\cos x\ \Longrightarrow\ \frac{1}{y}\,\dd y=\cos x\,\dd x\qquad(y\ne0)\]`],
+      ['Integrar', R_`\[\int\frac{1}{y}\,\dd y=\int\cos x\,\dd x\ \Longrightarrow\ \ln|y|=\sen x+C\]`],
+      ['Despejar', R_`\[|y|=\ee^{\sen x+C}=\ee^{C}\,\ee^{\sen x}\ \Longrightarrow\ y=K\,\ee^{\sen x}\quad(K=\pm\ee^{C})\]`],
+      ['Condición inicial', R_`\(y(0)=2\): \(2=K\,\ee^{\sen0}=K\,\ee^{0}=K\). Entonces \(y=2\,\ee^{\sen x}\).`],
+      ['El valor pedido', R_`\[y\!\left(\frac{\pi}{2}\right)=2\,\ee^{\sen\frac{\pi}{2}}=2\,\ee^{1}=2\ee\approx2\cdot2{,}7183=5{,}437\]`]
+    ], R_`\(y=2\,\ee^{\sen x}\); \(y\!\left(\dfrac{\pi}{2}\right)=2\ee\approx5{,}437\).`) },
+  { id:'sb2', tipo:'ver', et:'E3', enunciado:R_`Verificar si la ecuación \(y''-2y=-2x^2\) tiene como solución \(y=x^2-1\). Indicar orden y grado de la ecuación diferencial. ¿La solución dada es general o particular? Explicar.`,
+    sol:false, orden:2, grado:1, tipoGen:false,
+    pista:R_`\(y'=2x\), \(y''=2\). Sustituí y compará con \(-2x^2\): fijate si sobra un número.`,
+    fbOk:R_`Correcto: \(y''-2y=2-2x^2+2=4-2x^2\), que no es \(-2x^2\): no es solución. Orden 2, grado 1; sin constantes, sería particular.`,
+    resol:resolucion([
+      ['Derivar', R_`\(y=x^2-1\ \Longrightarrow\ y'=2x\ \Longrightarrow\ y''=2\).`],
+      ['Sustituir', R_`\[y''-2y=2-2\,(x^2-1)=2-2x^2+2=4-2x^2\]`],
+      ['Concluir', R_`Tendría que dar \(-2x^2\) para todo \(x\), pero da \(4-2x^2\): sobra un \(4\). <strong>No es solución.</strong> (La que sí verifica es \(y=x^2+1\): \(2-2x^2-2=-2x^2\).)`],
+      ['Orden y grado', R_`Derivada más alta \(y''\): orden 2, a la primera potencia: grado 1.`],
+      ['¿General o particular?', R_`No tiene constantes arbitrarias: si fuera solución, sería particular.`]
+    ], R_`No es solución. Orden 2, grado 1. Sería particular (no tiene constantes).`) },
+  { id:'sb3', tipo:'dom', et:'E4', enunciado:R_`Sea \(f:D\subseteq\mathbb{R}^2\to\mathbb{R}\,/\,f(x,y)=\dfrac{\ln(y-x^2)}{x-2}\). Hallar el dominio analítica y gráficamente.`,
+    items:[{t:R_`El punto \((0\,;\,1)\)`, r:true},{t:R_`El punto \((2\,;\,5)\)`, r:false},{t:R_`El punto \((1\,;\,1)\)`, r:false}],
+    pista:R_`Logaritmo: \(y-x^2>0\), estricta. Denominador: \(x\ne2\).`,
+    fbOk:R_`Correcto: \(D=\{(x\,;\,y)\,/\,y>x^2\wedge x\ne2\}\): el interior de la parábola, sin la parábola y sin la recta \(x=2\).`,
+    resol:resolucion([
+      ['La tabla de operaciones', TABLA_DOM([[R_`Logaritmo \(\ln(y-x^2)\)`,'No',R_`\(y-x^2>0\)`],[R_`División por \(x-2\)`,'No',R_`\(x-2\ne0\)`]])],
+      ['Forma analítica', R_`\[D=\left\{(x\,;\,y)\in\mathbb{R}^2\,/\,y>x^2\ \wedge\ x\ne2\right\}\]`],
+      ['Frontera y lado', R_`\(y=x^2\): parábola, <strong>excluida</strong> (estricta). \((0\,;\,1)\) cumple \(1>0\): el dominio es la parte de arriba. \(x=2\): recta vertical excluida.`],
+      ['Forma gráfica', LEY_DOM + cvDom('cv-sb3', { half:4.5, cy:3, dentro:(x,y)=>y-x*x>0, bordes:[{F:(x,y)=>y-x*x,inc:false},{F:(x,y)=>x-2,inc:false}], puntos:[[0,1,true],[2,5,false],[1,1,false]] })],
+      ['Los puntos preguntados', R_`\((0\,;\,1)\): \(1>0\) y \(0\ne2\): pertenece. \((2\,;\,5)\): \(x=2\), no pertenece. \((1\,;\,1)\): \(1-1=0\), no es \(>0\): no pertenece.`]
+    ], R_`\(D=\{(x\,;\,y)\in\mathbb{R}^2\,/\,y>x^2\wedge x\ne2\}\).`) },
+  { id:'sb4', tipo:'traza', et:'E5', enunciado:R_`Hallar las trazas de las superficies dadas. Graficarlas en los planos correspondientes y clasificarlas. a) \(-2x+3z+6=0\); b) \(\dfrac{x^2}{16}+\dfrac{y^2}{4}+\dfrac{z^2}{4}=1\).`,
+    grupos:[{t:R_`Superficie a) \(-2x+3z+6=0\)`},{t:R_`Superficie b) \(\dfrac{x^2}{16}+\dfrac{y^2}{4}+\dfrac{z^2}{4}=1\)`}], planos:conR(planosDe(0).concat(planosDe(1)), ['recta','recta','recta','elipse','elipse','circunferencia']),
+    pista:R_`a) es un plano sin \(y\): tres rectas, dos de ellas paralelas al eje \(y\). b) es un elipsoide: en el plano donde los dos denominadores que quedan son iguales, la traza es una circunferencia.`,
+    fbOk:R_`Correcto: tres rectas para el plano; para el elipsoide, elipses en \(xy\) y en \(xz\), y circunferencia de radio 2 en \(yz\).`,
+    resol:resolucion([
+      ['a) Traza con el plano \\(xy\\)', R_`\[\sis{-2x+3z+6=0 \\ z=0}\ \Longrightarrow\ -2x+6=0\ \Longrightarrow\ x=3\]Recta vertical \(x=3\) del plano \(xy\) (paralela al eje \(y\)).`],
+      ['a) Traza con el plano \\(xz\\)', R_`\[\sis{-2x+3z+6=0 \\ y=0}\ \Longrightarrow\ 3z=2x-6\ \Longrightarrow\ z=\frac{2}{3}x-2\]Recta: corta el eje \(x\) en \(3\) y el eje \(z\) en \(-2\).`],
+      ['a) Traza con el plano \\(yz\\)', R_`\[\sis{-2x+3z+6=0 \\ x=0}\ \Longrightarrow\ 3z+6=0\ \Longrightarrow\ z=-2\]Recta horizontal \(z=-2\) del plano \(yz\).`],
+      ['a) Gráficos', trz('cv-sb4a', [{p:'xy',F:(x,y)=>x-3,half:5,puntos:[[3,0]]},{p:'xz',F:(x,z)=>-2*x+3*z+6,half:5,puntos:[[3,0],[0,-2]]},{p:'yz',F:(y,z)=>z+2,half:5,puntos:[[0,-2]]}]) + 'Superficie: plano paralelo al eje y. Trazas: rectas.'],
+      ['b) Traza con el plano \\(xy\\)', R_`\[\sis{\frac{x^2}{16}+\frac{y^2}{4}+\frac{z^2}{4}=1 \\ z=0}\ \Longrightarrow\ \frac{x^2}{16}+\frac{y^2}{4}=1\]Elipse de semiejes \(4\) (eje \(x\)) y \(2\) (eje \(y\)).`],
+      ['b) Traza con el plano \\(xz\\)', R_`\[\sis{\frac{x^2}{16}+\frac{y^2}{4}+\frac{z^2}{4}=1 \\ y=0}\ \Longrightarrow\ \frac{x^2}{16}+\frac{z^2}{4}=1\]Elipse de semiejes \(4\) (eje \(x\)) y \(2\) (eje \(z\)).`],
+      ['b) Traza con el plano \\(yz\\)', R_`\[\sis{\frac{x^2}{16}+\frac{y^2}{4}+\frac{z^2}{4}=1 \\ x=0}\ \Longrightarrow\ \frac{y^2}{4}+\frac{z^2}{4}=1\ \Longrightarrow\ y^2+z^2=4\]Circunferencia de radio \(2\).`],
+      ['b) Gráficos', trz('cv-sb4b', [{p:'xy',F:(x,y)=>x*x/16+y*y/4-1,half:5.5},{p:'xz',F:(x,z)=>x*x/16+z*z/4-1,half:5.5},{p:'yz',F:(y,z)=>y*y/4+z*z/4-1,half:5.5}]) + 'Superficie: elipsoide (de revolución alrededor del eje x). Trazas: dos elipses y una circunferencia.']
+    ], R_`a) \(x=3\), \(z=\dfrac{2}{3}x-2\), \(z=-2\). b) elipses \(\dfrac{x^2}{16}+\dfrac{y^2}{4}=1\) y \(\dfrac{x^2}{16}+\dfrac{z^2}{4}=1\); circunferencia \(y^2+z^2=4\).`) }
+];
+
+/* ================= inicialización y navegación ================= */
+const init = {};
+const INITS = {
+  mapa: ()=>{ $('q-mapa').innerHTML = Q_MAPA.map(ejHTML).join(''); renderMath($('tab-mapa')); },
+  par: ()=>{ renderMath($('tab-par')); },
+  lin: ()=>{ $('ej-lin').innerHTML = EJ_LIN(); $('prac-lin').innerHTML = PRAC_LIN.map(ejHTML).join(''); renderMath($('tab-lin')); },
+  sep: ()=>{ $('ej-sep').innerHTML = EJ_SEP(); $('prac-sep').innerHTML = PRAC_SEP.map(ejHTML).join(''); renderMath($('tab-sep')); },
+  ver: ()=>{ $('ej-ver').innerHTML = EJ_VER(); $('prac-ver').innerHTML = PRAC_VER.map(ejHTML).join(''); renderMath($('tab-ver')); },
+  dom: ()=>{ $('ej-dom').innerHTML = EJ_DOM(); $('prac-dom').innerHTML = PRAC_DOM.map(ejHTML).join(''); renderMath($('tab-dom')); dibujarCanvases($('ej-dom')); },
+  tra: ()=>{ $('ej-tra').innerHTML = EJ_TRA(); $('prac-tra').innerHTML = PRAC_TRA.map(ejHTML).join(''); renderMath($('tab-tra')); dibujarCanvases($('ej-tra')); },
+  sim: ()=>{ $('prac-simA').innerHTML = SIM_A.map(ejHTML).join(''); $('prac-simB').innerHTML = SIM_B.map(ejHTML).join(''); renderMath($('tab-sim')); }
+};
+const TODOS = () => [...Q_MAPA, ...PRAC_LIN, ...PRAC_SEP, ...PRAC_VER, ...PRAC_DOM, ...PRAC_TRA, ...SIM_A, ...SIM_B];
+function actualizarProgreso(){ const ids=TODOS().map(e=>e.id); const n=ids.filter(i=>E.ejercicios[i]&&E.ejercicios[i].ok).length, t=ids.length; $('prog-txt').textContent=`${n} de ${t} ejercicios`; $('prog-bar').style.width=(100*n/t)+'%'; }
+let tabActual = 'mapa';
+function irA(id, sinScroll){
+  if(!INITS[id]) return;
+  $$('.tab-content').forEach(s=>s.classList.toggle('active', s.id==='tab-'+id));
+  $$('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
+  tabActual = id;
+  if(!init[id]){ init[id]=true; INITS[id](); } else dibujarCanvases($('tab-'+id));
+  if(!sinScroll) window.scrollTo({top:0, behavior:'smooth'});
+}
+$$('.tab-btn').forEach(b=>b.addEventListener('click',()=>irA(b.dataset.tab)));
+let _rst=null;
+document.addEventListener('DOMContentLoaded', ()=>{
+  cargar(); renderMath(document.body); init.mapa=true; INITS.mapa(); actualizarProgreso();
+  $('btn-reiniciar').addEventListener('click',ev=>{ const b=ev.currentTarget;
+    if(!_rst){ b.textContent='Tocá de nuevo para borrar todo'; b.classList.add('alerta'); _rst=setTimeout(()=>{ _rst=null; b.textContent='Borrar mi progreso'; b.classList.remove('alerta'); },4000); return; }
+    clearTimeout(_rst); _rst=null; try{ localStorage.removeItem(CLAVE); }catch(e){} location.reload(); });
+  const h=location.hash.slice(1); if(INITS[h] && h!=='mapa') irA(h);
+});
+let _tr=null; window.addEventListener('resize',()=>{ clearTimeout(_tr); _tr=setTimeout(()=>{ dibujarCanvases($('tab-'+tabActual)); },150); });
+
+/* ================= autotest ================= */
+window.__autotest = function(){
+  const r=[]; const ok=(n,v,e,tol=1e-9)=>r.push({n,v,e,ok:Math.abs(v-e)<=tol});
+  const d=(f,x,h=1e-6)=>(f(x+h)-f(x-h))/(2*h), d2=(f,x,h=1e-4)=>(f(x+h)-2*f(x)+f(x-h))/(h*h);
+  /* lineales: la solución particular verifica la ecuación y pasa por el punto */
+  const LIN=[ ['l1',x=>x+2/x,(x,y,yp)=>x*yp+y-2*x,[1,3],2,3], ['l2',x=>x**3+2/x**2,(x,y,yp)=>x*yp+2*y-5*x**3,[1,3],2,8.5], ['l3',x=>x**3/2-x,(x,y,yp)=>yp-y/x-x*x,[2,2],1,-0.5],
+    ['l4',x=>(Math.exp(-x)+Math.exp(-3*x))/2,(x,y,yp)=>yp+3*y-Math.exp(-x),[0,1],1,0.208833], ['l5',x=>x**5/2+x**3*Math.log(x)+1.5*x**3,(x,y,yp)=>x*yp-3*y-x**5-x**3,[1,2],2,33.5452],
+    ['l6',x=>x*x/5-x/2+0.3/x**3,(x,y,yp)=>x*yp+3*y-x*x+2*x,[1,0],2,-0.1625], ['sa1',x=>x**4/6+x*x/4+7/12/x**2,(x,y,yp)=>x*yp+2*y-x**4-x*x,[1,1],2,3.8125], ['sb1',x=>x**3/2+x*Math.log(x)+1.5*x,(x,y,yp)=>x*yp-y-x**3-x,[1,2],2,8.3863],
+    ['ej1',x=>x**4/2-x*x*Math.log(x)+2.5*x*x,(x,y,yp)=>x*yp-2*y-x**4+x*x,[1,3],1,3], ['ej2',x=>x**3/6-x*x/5+1/30/x**3,(x,y,yp)=>x*yp+3*y-x**3+x*x,[1,0],1,0] ];
+  for(const [n,f,ec,p,xq,vq] of LIN){ for(const x of [0.7,1.3,2.1]) ok(n+' verifica x='+x, ec(x,f(x),d(f,x)), 0, 1e-4); ok(n+' punto', f(p[0]), p[1], 1e-9); ok(n+' valor pedido', f(xq), vq, 1e-3); }
+  /* separables */
+  const SEP=[ ['s1',x=>3*Math.exp(x*x/2),(x,y,yp)=>yp-x*y,[0,3],1,4.94616], ['s2',x=>Math.sqrt(Math.sin(x)+1),(x,y,yp)=>2*y*yp-Math.cos(x),[0,1],Math.PI/2,1.41421], ['s3',x=>(x+1)/(1-x),(x,y,yp)=>yp-(1+y*y)/(1+x*x),[0,1],0.5,3],
+    ['s4',x=>Math.log(Math.exp(x)+1),(x,y,yp)=>yp-Math.exp(x-y),[0,Math.log(2)],1,1.31326], ['s5',x=>Math.tan(Math.log(x)),(x,y,yp)=>x*yp-y*y-1,[1,0],Math.E,1.55741], ['s6',x=>2*Math.sqrt(x*x+1),(x,y,yp)=>yp-x*y/(x*x+1),[0,2],2,4.47214], ['sa2s',x=>1/(1-x*x),(x,y,yp)=>yp-2*x*y*y,[0,1],0.5,1.33333], ['sb2s',x=>2*Math.exp(Math.sin(x)),(x,y,yp)=>yp-y*Math.cos(x),[0,2],Math.PI/2,5.43656] ];
+  for(const [n,f,ec,p,xq,vq] of SEP){ for(const x of [0.3,0.6,1.2]) ok(n+' verifica x='+x, ec(x,f(x),d(f,x)), 0, 1e-4); ok(n+' punto', f(p[0]), p[1], 1e-9); ok(n+' valor pedido', f(xq), vq, 1e-3); }
+  /* verificar: residuo en varios x (0 si es solución, distinto de 0 si no) */
+  const VER=[ ['v1',x=>x*x,(x,y,yp,ypp)=>yp**3-8*x**3,true], ['v2',x=>x*x+1,(x,y,yp,ypp)=>ypp-4*yp,false], ['v3',x=>2*Math.cos(2*x)-3*Math.sin(2*x),(x,y,yp,ypp)=>ypp+4*y,true], ['v4',x=>5/x+1,(x,y,yp,ypp)=>x*yp+y-1,true],
+    ['v5',x=>(x+3)**2,(x,y,yp,ypp)=>yp*yp-4*y,true], ['v6',x=>x*Math.exp(2*x),(x,y,yp,ypp)=>ypp-2*yp+y,false], ['sa2',x=>3-Math.exp(-x),(x,y,yp,ypp)=>ypp+yp,true], ['sb2',x=>x*x-1,(x,y,yp,ypp)=>ypp-2*y+2*x*x,false],
+    ['ej1',x=>-x*x/2,(x,y,yp,ypp)=>ypp-4*yp,false], ['ej2',x=>x*x,(x,y,yp,ypp)=>y-yp*x+yp*yp/4,true] ];
+  for(const [n,f,ec,es] of VER){ let max=0; for(const x of [0.5,1,1.7]) max=Math.max(max,Math.abs(ec(x,f(x),d(f,x),d2(f,x)))); ok(n+(es?' es solución':' no es solución'), es?max:(max>1e-3?0:1), 0, 1e-3); }
+  /* dominios y trazas: puntos de control contra las respuestas de los ejercicios */
+  for(const e of [...PRAC_DOM, SIM_A[3], SIM_B[3]]){ const sp=CANVAS['cv-'+e.id]; ok('dom '+e.id+' canvas', sp?1:0, 1); if(!sp) continue;
+    ok('dom '+e.id+' puntos coherentes', sp.puntos.length===e.items.length && sp.puntos.every((p,i)=>p[2]===e.items[i].r) ? 1 : 0, 1);
+    sp.puntos.forEach((p,i)=>{ if(p[2]) ok('dom '+e.id+' punto '+i+' dentro', sp.dentro(p[0],p[1])?1:0, 1); }); }
+  /* trazas: cada punto marcado está sobre la curva */
+  for(const k in CANVAS){ const sp=CANVAS[k]; if(sp.tipo==='tra' && sp.F && sp.puntos) sp.puntos.forEach((p,i)=>ok('traza '+k+' punto '+i, sp.F(p[0],p[1]), 0, 1e-9)); }
+  return r;
+};
+</script>
+</body>
+</html>
